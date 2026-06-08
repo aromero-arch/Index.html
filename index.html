@@ -34,7 +34,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
 
-  /* ── LAYOUT ── */
+  /* ── Estructura principal de la página ── */
   .shell { display: flex; min-height: 100vh; }
   .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 10; }
   .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
@@ -42,7 +42,7 @@
   .content { padding: 28px; max-width: 1400px; width: 100%; }
   .form-card-wide { margin-left: -28px; margin-right: -28px; border-left: none; border-right: none; border-radius: 0; box-shadow: none; }
 
-  /* ── SIDEBAR ── */
+  /* ── Menú lateral izquierdo ── */
   .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
   .logo-text { font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
   .logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
@@ -55,22 +55,22 @@
   .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border); }
   .role-selector { width: 100%; font-size: 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  /* ── TOPBAR ── */
+  /* ── Barra superior con título y usuario ── */
   .page-title { font-size: 15px; font-weight: 600; }
   .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); }
   .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--purple-bg); color: var(--purple-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
 
-  /* ── PAGES ── */
+  /* ── Páginas o secciones de contenido ── */
   .page { display: none; }
   .page.active { display: block; }
 
-  /* ── TYPE TABS ── */
+  /* ── Pestañas para filtrar por tipo ── */
   .type-tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
   .type-tab { padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text2); transition: all .15s; font-family: 'DM Sans', sans-serif; }
   .type-tab:hover { border-color: var(--border2); color: var(--text); }
   .type-tab.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 500; }
 
-  /* ── FORM ── */
+  /* ── Tarjetas y campos del formulario ── */
   .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
   .form-card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -86,7 +86,7 @@
   .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
   .field textarea { resize: vertical; min-height: 80px; }
 
-  /* ── ROWS TABLE ── */
+  /* ── Tabla de artículos dentro del formulario ── */
   .rows-wrap { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 12px; }
   .rows-head { display: grid; padding: 8px 14px; background: var(--surface2); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .4px; gap: 6px; }
   .row-item { display: grid; gap: 6px; padding: 7px 14px; border-top: 1px solid var(--border); align-items: center; }
@@ -98,7 +98,7 @@
   .btn-del { background: none; border: 1px solid var(--border); color: var(--text3); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
   .btn-del:hover { border-color: #e24b4a; color: #e24b4a; background: var(--red-bg); }
 
-  /* ── BUTTONS ── */
+  /* ── Estilos de botones ── */
   .btn-add { width: 100%; font-size: 12px; color: var(--text2); background: none; border: 1px dashed var(--border2); border-radius: var(--radius); padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px; transition: all .15s; font-family: 'DM Sans', sans-serif; }
   .btn-add:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
   .btn-primary { background: var(--accent); color: var(--accent-text); border: none; padding: 9px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: 'DM Sans', sans-serif; transition: opacity .15s; }
@@ -112,7 +112,7 @@
   .btn-action  { background: var(--blue-bg); color: var(--blue-text); }
   .btn-ghost { padding: 8px 16px; background: none; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); cursor: pointer; }
 
-  /* ── VALIDATION ── */
+  /* ── Panel de errores de validación ── */
   .validation-panel { background:var(--red-bg); border:1px solid var(--red-text); border-radius:var(--radius-lg); padding:14px 18px; margin-bottom:16px; }
   .vp-header { display:flex; align-items:center; gap:8px; color:var(--red-text); font-size:13px; margin-bottom:10px; }
   .vp-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
@@ -120,7 +120,7 @@
   .vp-item:hover { background:rgba(255,255,255,.75); text-decoration:underline; }
   .field-highlight, .field-error-highlight { outline:2px solid var(--red-text) !important; outline-offset:2px; background:var(--red-bg) !important; }
 
-  /* ── AUTH / REQ CARDS ── */
+  /* ── Tarjetas de aprobaciones y requisiciones ── */
   .auth-card, .req-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:12px; box-shadow:var(--shadow); }
   .auth-card-head, .req-card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
   .auth-card-left, .req-card-left { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
@@ -132,7 +132,7 @@
   .auth-chip { font-size:11px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:3px 9px; color:var(--text2); }
   .auth-card-actions, .req-card-actions { display:flex; gap:8px; justify-content:flex-end; padding-top:12px; border-top:1px solid var(--border); flex-wrap:wrap; }
 
-  /* ── BADGES ── */
+  /* ── Etiquetas de estado y tipo ── */
   .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; }
   .badge-draft       { background: var(--surface2);  color: var(--text3); }
   .badge-pending     { background: var(--amber-bg);  color: var(--amber-text); }
@@ -152,13 +152,13 @@
   .prio-medio { background:var(--amber-bg); color:var(--amber-text); padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; }
   .prio-bajo  { background:var(--teal-bg);  color:var(--teal-text);  padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; }
 
-  /* ── METRICS ── */
+  /* ── Tarjetas de métricas e indicadores ── */
   .metrics-grid, .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
   .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; box-shadow: var(--shadow); }
   .metric-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
   .metric-value, .metric-val { font-size: 22px; font-weight: 600; }
 
-  /* ── TABLE ── */
+  /* ── Tabla de datos del concentrado ── */
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
   .conc-table, .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .conc-table th, .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .4px; background: var(--surface2); border-bottom: 1px solid var(--border); }
@@ -167,7 +167,7 @@
   .conc-table tr:hover td, .data-table tr:hover td { background: var(--surface2); }
   .folio { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
 
-  /* ── FILTER BAR ── */
+  /* ── Barra de filtros y búsqueda ── */
   .filter-bar, .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
   .filter-bar select, .filter-bar input,
   .filter-select, .search-input {
@@ -178,38 +178,38 @@
   .filter-bar select:focus, .filter-bar input:focus,
   .filter-select:focus, .search-input:focus { outline: none; border-color: var(--accent); }
 
-  /* ── SEMÁFORO ── */
+  /* ── Indicador visual de prioridad (semáforo) ── */
   .semaforo { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
   .sem-verde    { background: #22c55e; }
   .sem-amarillo { background: #f59e0b; }
   .sem-rojo     { background: #ef4444; }
 
-  /* ── EMPTY ── */
+  /* ── Estado vacío cuando no hay resultados ── */
   .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
   .empty svg { width: 36px; height: 36px; opacity: .4; }
 
-  /* ── SECTION HEADER ── */
+  /* ── Encabezado de cada sección ── */
   .section-header { margin-bottom: 24px; }
   .section-header h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
   .section-header p { font-size: 13px; color: var(--text2); }
 
-  /* ── FORM ACTIONS ── */
+  /* ── Botones de acción al pie del formulario ── */
   .form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--border); margin-top: 8px; }
 
-  /* ── TOTALS ── */
+  /* ── Fila de totales debajo de la tabla ── */
   .totals-row { display: flex; justify-content: flex-end; gap: 20px; font-size: 13px; margin-bottom: 16px; padding: 10px 14px; background: var(--surface2); border-radius: var(--radius); }
 
-  /* ── TOAST ── */
+  /* ── Mensaje emergente de confirmación ── */
   #toast { position: fixed; bottom: 24px; right: 24px; background: var(--accent); color: var(--accent-text); padding: 11px 18px; border-radius: var(--radius); font-size: 13px; z-index: 999; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 320px; }
 
-  /* ── MODAL ── */
+  /* ── Ventana emergente modal ── */
   .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.48); z-index:999; display:flex; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto; }
   .modal-box { background:var(--surface); border-radius:var(--radius-lg); padding:28px; width:100%; max-width:520px; box-shadow:0 20px 40px rgba(0,0,0,.22); margin:auto; }
   .modal-title { font-size:15px; font-weight:600; margin-bottom:6px; }
   .modal-sub { font-size:13px; color:var(--text2); margin-bottom:18px; }
   .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
 
-  /* ── NOTIFICACIONES ── */
+  /* ── Panel y botón de notificaciones ── */
   .notif-btn { position:relative; background:none; border:none; cursor:pointer; padding:6px; border-radius:var(--radius); color:var(--text2); display:flex; align-items:center; justify-content:center; transition:background .15s; }
   .notif-btn:hover { background:var(--surface2); color:var(--text); }
   .notif-btn svg { width:18px; height:18px; }
@@ -228,17 +228,17 @@
   .notif-time { font-size:10px; color:var(--text3); margin-top:3px; font-family:'DM Mono',monospace; }
   .notif-empty { padding:28px 16px; text-align:center; color:var(--text3); font-size:13px; }
 
-  /* ── COMPAT: variables JS inline ── */
+  /* ── Variables de fuente para uso desde JavaScript ── */
   :root {
     --font-sans: 'DM Sans', sans-serif;
     --font-mono: 'DM Mono', monospace;
   }
 
-  /* ── COMPAT: form-grid overrides (requisiciones usa 3-col por defecto) ── */
+  /* ── Ajuste de cuadrícula del formulario (3 columnas por defecto) ── */
   .form-grid { grid-template-columns: 1fr 1fr 1fr; }
   .form-grid.two { grid-template-columns: 1fr 1fr; }
 
-  /* ── CONCENTRADO filas expandibles ── */
+  /* ── Filas expandibles en la vista de concentrado ── */
   .seg-row { cursor: pointer; }
   .seg-row td { transition: background .12s; }
   .seg-row.expanded td { background: var(--blue-bg) !important; }
@@ -246,7 +246,7 @@
   .seg-chevron { font-size: 10px; color: var(--text3); display: inline-block; transition: transform .2s; }
   .seg-row.expanded .seg-chevron { transform: rotate(90deg); }
 
-  /* ── COMPAT: init hidden ── */
+  /* ── La app se oculta hasta que el usuario inicia sesión ── */
   #app { display: none; }
 
   svg.icon { width: 15px; height: 15px; flex-shrink: 0; }
@@ -259,7 +259,7 @@
     .auth-card-body, .req-card-body { grid-template-columns: 1fr 1fr; }
   }
 
-  /* ── LOGIN ── */
+  /* ── Pantalla de inicio de sesión ── */
   .login-screen { position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center; }
   .login-box { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;width:100%;max-width:380px;box-shadow:var(--shadow-lg); }
   .login-logo { font-size:20px;font-weight:600;letter-spacing:-.3px;margin-bottom:3px; }
@@ -528,7 +528,7 @@
 <div id="toast"></div>
 
 <script>
-  // ─── CONFIGURACIÓN API ────────────────────────────────────────────────────
+  // ─── Dirección base del servidor (API) ─────────────────────────────────────
   // Cambia esta URL a la de tu servidor cuando lo despliegues
   const API_BASE = '/api';
 
@@ -539,7 +539,7 @@
   let notifications = [];
   let _authToken   = null; // JWT guardado en memoria (no localStorage)
 
-  // ─── API HELPER ───────────────────────────────────────────────────────────
+  // ─── Función para llamar al servidor con autenticación ──────────────────────
   async function api(path, options = {}) {
     const headers = { 'Content-Type': 'application/json' };
     if (_authToken) headers['Authorization'] = 'Bearer ' + _authToken;
@@ -549,7 +549,7 @@
     return json.data;
   }
 
-  // ─── LOGIN / LOGOUT ──────────────────────────────────────────────────────
+  // ─── Inicio y cierre de sesión ──────────────────────────────────────────────
   function getInitials(name) {
     return (name||'').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('');
   }
@@ -623,7 +623,7 @@
     document.getElementById('login-error').style.display = 'none';
   }
 
-  // ─── CAMBIAR CONTRASEÑA ───────────────────────────────────────────────────
+  // ─── Modal para cambiar la contraseña del usuario ──────────────────────────
   function showCambiarPassModal(forzado = false) {
     removeModal();
     const overlay = document.createElement('div');
@@ -714,7 +714,7 @@
     setArea('req-area');
   }
 
-  // ─── SELECTOR DE ROL ──────────────────────────────────────────────────────
+  // ─── Cambia la vista según el rol del usuario ───────────────────────────────
   function switchRole(role) {
     if (!CURRENT_USER) return;
     document.getElementById('sb-name').textContent      = CURRENT_USER.name;
@@ -740,7 +740,7 @@
     show('nav-mis',          true);
   }
 
-  // ─── PERSISTENCIA — reemplaza localStorage con API ───────────────────────
+  // ─── Carga y sincronización de datos desde el servidor ─────────────────────
   async function loadDB() {
     try {
       db = await api('/requisiciones.php');
@@ -820,7 +820,7 @@
   // saveDB ya no existe — cada acción llama directamente a la API
   function saveDB() { /* no-op: datos se guardan en MySQL via API */ }
 
-  // ─── NAVEGACIÓN ───────────────────────────────────────────────────────────
+  // ─── Navegación entre secciones del menú lateral ───────────────────────────
   const SECTION_TITLES = { nueva:'Nueva requisición', aprobaciones:'Aprobaciones pendientes', compras:'Gestión de compras', seguimiento:'Concentrado', mis:'Mis solicitudes' };
 
   function showSection(name) {
@@ -840,7 +840,7 @@
     updateBadges();
   }
 
-  // ─── FOLIO ────────────────────────────────────────────────────────────────
+  // ─── Generación del número de folio de cada requisición ────────────────────
   function genFolio() {
     const n = String(folioCounter++).padStart(4, '0');
     return 'REQ-' + n;
@@ -854,7 +854,7 @@
     return `${dd}/${m}/${y}`;
   }
 
-  // ─── ARTÍCULOS ROWS ───────────────────────────────────────────────────────
+  // ─── Renglones de artículos en el formulario de nueva requisición ───────────
   function addArtRow() {
     const cont = document.getElementById('art-rows');
     const idx = cont.querySelectorAll('.row-item').length + 1;
@@ -879,7 +879,7 @@
     });
   }
 
-  // ─── DIRECCIÓN ────────────────────────────────────────────────────────────
+  // ─── Manejo del campo de dirección de entrega ───────────────────────────────
   function onDirSelectChange() {
     const val = document.getElementById('req-dir-select').value;
     document.getElementById('req-dir-custom').style.display = val === 'otra' ? '' : 'none';
@@ -908,7 +908,7 @@
     return '';
   }
 
-  // ─── VALIDACIÓN ───────────────────────────────────────────────────────────
+  // ─── Validación del formulario antes de enviarlo ───────────────────────────
   function validarReq() {
     const errors = [];
     const req = (id, label) => {
@@ -967,7 +967,7 @@
     panel.scrollIntoView({ behavior:'smooth', block:'start' });
   }
 
-  // ─── SUBMIT ───────────────────────────────────────────────────────────────
+  // ─── Envío del formulario (guardar borrador o enviar a aprobación) ──────────
   function getReqData() {
     const arts = [];
     document.querySelectorAll('#art-rows .row-item').forEach(r => {
@@ -1041,7 +1041,7 @@
     if (old) old.remove();
   }
 
-  // ─── BADGES ───────────────────────────────────────────────────────────────
+  // ─── Contadores numéricos en el menú lateral ────────────────────────────────
   function updateBadges() {
     const pendAprobacion = db.filter(r => r.status === 'pendiente').length;
     const pendCompras = db.filter(r => r.status === 'aprobada').length;
@@ -1051,7 +1051,7 @@
     bc.textContent = pendCompras;    bc.style.display = pendCompras > 0 ? 'inline' : 'none';
   }
 
-  // ─── APROBACIONES ─────────────────────────────────────────────────────────
+  // ─── Vista y acciones de aprobación para el jefe de área ───────────────────
   function renderAprobaciones() {
     if (CURRENT_USER?.role !== 'jefe') return;
     const cont = document.getElementById('aprobaciones-list');
@@ -1522,7 +1522,7 @@
     } catch(e) { showToast('Error: ' + e.message); }
   }
 
-  // ─── ENCUESTA DE CALIDAD ──────────────────────────────────────────────────
+  // ─── Encuesta de satisfacción al recibir los artículos ──────────────────────
   function showEncuestaModal(folio) {
     removeModal();
     const overlay = document.createElement('div');
@@ -1862,7 +1862,7 @@
     });
   }
 
-  // ─── HELPERS ──────────────────────────────────────────────────────────────
+  // ─── Funciones de apoyo (cerrar modal, mostrar toast, cambiar estado) ───────
   function setStatus(folio, status) {
     const req = db.find(r => r.folio === folio);
     if (req) req.status = status;
@@ -1882,7 +1882,7 @@
     toastTimer = setTimeout(() => t.style.opacity = '0', 3200);
   }
 
-  // ─── NOTIFICACIONES — API polling ────────────────────────────────────────
+  // ─── Notificaciones: consulta al servidor cada 15 segundos ─────────────────
   let _notifInterval = null;
 
   function startNotifPolling() {
@@ -1974,7 +1974,7 @@
     }
   });
 
-  // ─── EXPORTAR CSV ─────────────────────────────────────────────────────────
+  // ─── Exportar el concentrado a un archivo CSV descargable ───────────────────
   function exportConcentradoCSV() {
     const todasSeg = db.filter(r => ['aprobada','parcial','entregada'].includes(r.status));
 
@@ -2036,7 +2036,7 @@
     showToast(`✓ ${reqs.length} registros exportados`);
   }
 
-  // ─── INIT ─────────────────────────────────────────────────────────────────
+  // ─── Inicialización al cargar la página ────────────────────────────────────
   db = [];
   notifications = [];
   addArtRow();
