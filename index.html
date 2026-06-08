@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voxpop — Requisiciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #e2ddd8;
+    --border2: #cec9c2;
+    --text: #1a1916;
+    --text2: #6b6760;
+    --text3: #a09c97;
+    --accent: #1a1916;
+    --accent-text: #ffffff;
+    --purple-bg: #eeecfe; --purple-text: #3c3489;
+    --teal-bg: #e0f5ee; --teal-text: #0f6e56;
+    --amber-bg: #faeeda; --amber-text: #854f0b;
+    --coral-bg: #faece7; --coral-text: #993c1d;
+    --blue-bg: #e6f1fb; --blue-text: #185fa5;
+    --green-bg: #eaf3de; --green-text: #3b6d11;
+    --red-bg: #fcebeb; --red-text: #a32d2d;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+
+  /* ── LAYOUT ── */
+  .shell { display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 10; }
+  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 9; }
+  .content { padding: 28px; max-width: 1400px; width: 100%; }
+  .form-card-wide { margin-left: -28px; margin-right: -28px; border-left: none; border-right: none; border-radius: 0; box-shadow: none; }
+
+  /* ── SIDEBAR ── */
+  .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+  .logo-text { font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
+  .logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13px; color: var(--text2); transition: all .15s; border: none; background: none; width: 100%; text-align: left; position: relative; }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent); color: var(--accent-text); font-weight: 500; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .nav-badge { background: #e24b4a; color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: 600; margin-left: auto; }
+  .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border); }
+  .role-selector { width: 100%; font-size: 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* ── TOPBAR ── */
+  .page-title { font-size: 15px; font-weight: 600; }
+  .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--purple-bg); color: var(--purple-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── TYPE TABS ── */
+  .type-tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+  .type-tab { padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text2); transition: all .15s; font-family: 'DM Sans', sans-serif; }
+  .type-tab:hover { border-color: var(--border2); color: var(--text); }
+  .type-tab.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 500; }
+
+  /* ── FORM ── */
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .form-card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .4px; }
+  .field input, .field select, .field textarea {
+    font-size: 13px; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); width: 100%; font-family: 'DM Sans', sans-serif;
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  /* ── ROWS TABLE ── */
+  .rows-wrap { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 12px; }
+  .rows-head { display: grid; padding: 8px 14px; background: var(--surface2); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .4px; gap: 6px; }
+  .row-item { display: grid; gap: 6px; padding: 7px 14px; border-top: 1px solid var(--border); align-items: center; }
+  .row-item input, .row-item select {
+    font-size: 11px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; width: 100%;
+  }
+  .row-item input:focus, .row-item select:focus { outline: none; border-color: var(--accent); }
+  .btn-del { background: none; border: 1px solid var(--border); color: var(--text3); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+  .btn-del:hover { border-color: #e24b4a; color: #e24b4a; background: var(--red-bg); }
+
+  /* ── BUTTONS ── */
+  .btn-add { width: 100%; font-size: 12px; color: var(--text2); background: none; border: 1px dashed var(--border2); border-radius: var(--radius); padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px; transition: all .15s; font-family: 'DM Sans', sans-serif; }
+  .btn-add:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+  .btn-primary { background: var(--accent); color: var(--accent-text); border: none; padding: 9px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: 'DM Sans', sans-serif; transition: opacity .15s; }
+  .btn-primary:hover { opacity: .85; }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 9px 16px; border-radius: var(--radius); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+  .btn-secondary:hover { background: var(--surface2); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; border: none; transition: opacity .15s; }
+  .btn-sm:hover { opacity: .75; }
+  .btn-approve { background: var(--teal-bg); color: var(--teal-text); }
+  .btn-reject  { background: var(--red-bg);  color: var(--red-text); }
+  .btn-action  { background: var(--blue-bg); color: var(--blue-text); }
+  .btn-ghost { padding: 8px 16px; background: none; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); cursor: pointer; }
+
+  /* ── VALIDATION ── */
+  .validation-panel { background:var(--red-bg); border:1px solid var(--red-text); border-radius:var(--radius-lg); padding:14px 18px; margin-bottom:16px; }
+  .vp-header { display:flex; align-items:center; gap:8px; color:var(--red-text); font-size:13px; margin-bottom:10px; }
+  .vp-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
+  .vp-item { display:flex; align-items:flex-start; gap:6px; font-size:12px; color:var(--red-text); padding:6px 10px; background:rgba(255,255,255,.45); border-radius:6px; cursor:pointer; transition:background .15s; }
+  .vp-item:hover { background:rgba(255,255,255,.75); text-decoration:underline; }
+  .field-highlight, .field-error-highlight { outline:2px solid var(--red-text) !important; outline-offset:2px; background:var(--red-bg) !important; }
+
+  /* ── AUTH / REQ CARDS ── */
+  .auth-card, .req-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:12px; box-shadow:var(--shadow); }
+  .auth-card-head, .req-card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .auth-card-left, .req-card-left { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .auth-folio, .req-folio { font-family:'DM Mono',monospace; font-size:12px; color:var(--text3); }
+  .auth-card-body, .req-card-body { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px 16px; margin-bottom:12px; }
+  .auth-label, .req-info-label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.4px; }
+  .auth-value, .req-info-value { font-size:13px; color:var(--text); }
+  .auth-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .auth-chip { font-size:11px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:3px 9px; color:var(--text2); }
+  .auth-card-actions, .req-card-actions { display:flex; gap:8px; justify-content:flex-end; padding-top:12px; border-top:1px solid var(--border); flex-wrap:wrap; }
+
+  /* ── BADGES ── */
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; }
+  .badge-draft       { background: var(--surface2);  color: var(--text3); }
+  .badge-pending     { background: var(--amber-bg);  color: var(--amber-text); }
+  .badge-autorizado  { background: var(--teal-bg);   color: var(--teal-text); }
+  .badge-rechazado   { background: var(--red-bg);    color: var(--red-text); }
+  .badge-dispersado  { background: var(--blue-bg);   color: var(--blue-text); }
+  .badge-type        { background: var(--surface2);  color: var(--text2); font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+  /* Requisiciones badge colors */
+  .badge-pendiente   { background: var(--amber-bg);  color: var(--amber-text); }
+  .badge-aprobada    { background: var(--teal-bg);   color: var(--teal-text); }
+  .badge-rechazada   { background: var(--red-bg);    color: var(--red-text); }
+  .badge-compras     { background: var(--blue-bg);   color: var(--blue-text); }
+  .badge-entregada   { background: var(--teal-bg);   color: var(--teal-text); }
+  .badge-parcial     { background: var(--amber-bg);  color: var(--amber-text); }
+  /* Prioridades */
+  .prio-alto  { background:var(--coral-bg); color:var(--coral-text); padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; }
+  .prio-medio { background:var(--amber-bg); color:var(--amber-text); padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; }
+  .prio-bajo  { background:var(--teal-bg);  color:var(--teal-text);  padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; }
+
+  /* ── METRICS ── */
+  .metrics-grid, .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; box-shadow: var(--shadow); }
+  .metric-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+  .metric-value, .metric-val { font-size: 22px; font-weight: 600; }
+
+  /* ── TABLE ── */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+  .conc-table, .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .conc-table th, .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .4px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .conc-table td, .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .conc-table tr:last-child td, .data-table tr:last-child td { border-bottom: none; }
+  .conc-table tr:hover td, .data-table tr:hover td { background: var(--surface2); }
+  .folio { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
+
+  /* ── FILTER BAR ── */
+  .filter-bar, .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-bar select, .filter-bar input,
+  .filter-select, .search-input {
+    font-size: 12px; padding: 7px 11px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif;
+  }
+  .filter-bar input, .search-input { min-width: 200px; }
+  .filter-bar select:focus, .filter-bar input:focus,
+  .filter-select:focus, .search-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ── SEMÁFORO ── */
+  .semaforo { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+  .sem-verde    { background: #22c55e; }
+  .sem-amarillo { background: #f59e0b; }
+  .sem-rojo     { background: #ef4444; }
+
+  /* ── EMPTY ── */
+  .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .empty svg { width: 36px; height: 36px; opacity: .4; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { margin-bottom: 24px; }
+  .section-header h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .section-header p { font-size: 13px; color: var(--text2); }
+
+  /* ── FORM ACTIONS ── */
+  .form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--border); margin-top: 8px; }
+
+  /* ── TOTALS ── */
+  .totals-row { display: flex; justify-content: flex-end; gap: 20px; font-size: 13px; margin-bottom: 16px; padding: 10px 14px; background: var(--surface2); border-radius: var(--radius); }
+
+  /* ── TOAST ── */
+  #toast { position: fixed; bottom: 24px; right: 24px; background: var(--accent); color: var(--accent-text); padding: 11px 18px; border-radius: var(--radius); font-size: 13px; z-index: 999; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 320px; }
+
+  /* ── MODAL ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.48); z-index:999; display:flex; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto; }
+  .modal-box { background:var(--surface); border-radius:var(--radius-lg); padding:28px; width:100%; max-width:520px; box-shadow:0 20px 40px rgba(0,0,0,.22); margin:auto; }
+  .modal-title { font-size:15px; font-weight:600; margin-bottom:6px; }
+  .modal-sub { font-size:13px; color:var(--text2); margin-bottom:18px; }
+  .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
+
+  /* ── NOTIFICACIONES ── */
+  .notif-btn { position:relative; background:none; border:none; cursor:pointer; padding:6px; border-radius:var(--radius); color:var(--text2); display:flex; align-items:center; justify-content:center; transition:background .15s; }
+  .notif-btn:hover { background:var(--surface2); color:var(--text); }
+  .notif-btn svg { width:18px; height:18px; }
+  .notif-dot { position:absolute; top:-2px; right:-2px; background:#e24b4a; color:#fff; border-radius:10px; padding:1px 5px; font-size:10px; font-weight:700; min-width:16px; text-align:center; display:none; line-height:14px; }
+  .notif-panel { position:fixed; top:57px; right:14px; width:340px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); z-index:500; overflow:hidden; display:none; }
+  .notif-header { padding:11px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .notif-header span { font-size:13px; font-weight:600; }
+  .notif-mark-all { font-size:11px; color:var(--text3); background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .notif-mark-all:hover { color:var(--text); }
+  .notif-item { padding:11px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s; }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-item:hover { background:var(--surface2); }
+  .notif-item.unread { background:var(--blue-bg); }
+  .notif-item.unread:hover { background:#d6eaf8; }
+  .notif-msg { font-size:12px; color:var(--text); line-height:1.45; }
+  .notif-time { font-size:10px; color:var(--text3); margin-top:3px; font-family:'DM Mono',monospace; }
+  .notif-empty { padding:28px 16px; text-align:center; color:var(--text3); font-size:13px; }
+
+  /* ── COMPAT: variables JS inline ── */
+  :root {
+    --font-sans: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  /* ── COMPAT: form-grid overrides (requisiciones usa 3-col por defecto) ── */
+  .form-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.two { grid-template-columns: 1fr 1fr; }
+
+  /* ── CONCENTRADO filas expandibles ── */
+  .seg-row { cursor: pointer; }
+  .seg-row td { transition: background .12s; }
+  .seg-row.expanded td { background: var(--blue-bg) !important; }
+  .seg-detail td { background: var(--surface2); }
+  .seg-chevron { font-size: 10px; color: var(--text3); display: inline-block; transition: transform .2s; }
+  .seg-row.expanded .seg-chevron { transform: rotate(90deg); }
+
+  /* ── COMPAT: init hidden ── */
+  #app { display: none; }
+
+  svg.icon { width: 15px; height: 15px; flex-shrink: 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 56px; }
+    .main { margin-left: 56px; }
+    .logo-text, .logo-sub, .nav-item span, .sidebar-bottom { display: none; }
+    .metrics-grid, .metrics { grid-template-columns: 1fr 1fr; }
+    .auth-card-body, .req-card-body { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── LOGIN ── */
+  .login-screen { position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center; }
+  .login-box { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;width:100%;max-width:380px;box-shadow:var(--shadow-lg); }
+  .login-logo { font-size:20px;font-weight:600;letter-spacing:-.3px;margin-bottom:3px; }
+  .login-sub { font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:32px; }
+  .login-error { background:var(--red-bg);color:var(--red-text);border:1px solid #f3baba;border-radius:var(--radius);padding:10px 13px;font-size:13px;margin-bottom:16px;display:none; }
+  .login-field { display:flex;flex-direction:column;gap:5px;margin-bottom:16px; }
+  .login-field label { font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px; }
+  .login-field input { font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);width:100%;font-family:'DM Sans',sans-serif;transition:border-color .15s; }
+  .login-field input:focus { outline:none;border-color:var(--accent); }
+  input[readonly] { background:var(--surface2) !important;color:var(--text3) !important;cursor:default !important;border-style:dashed !important; }
+</style>
+</head>
+<body>
+
+<!-- ══ PANTALLA DE LOGIN ══ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Voxpop</div>
+    <div class="login-sub">Sistema de Requisiciones</div>
+    <div class="login-error" id="login-error">Correo o contraseña incorrectos.</div>
+    <div class="login-field">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="tu@voxpop.com.mx" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">
+      <svg style="width:16px;height:16px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Ingresar
+    </button>
+  </div>
+</div>
+
+<div class="shell" id="app" style="display:none">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">VOXPOP</div>
+      <div class="logo-sub">Requisiciones</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showSection('nueva')" id="nav-nueva">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+        <span>Nueva requisición</span>
+      </button>
+      <button class="nav-item" onclick="showSection('mis')" id="nav-mis">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <span>Mis solicitudes</span>
+      </button>
+      <button class="nav-item" onclick="showSection('aprobaciones')" id="nav-aprobaciones">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Aprobaciones</span>
+        <span class="nav-badge" id="badge-aprobaciones">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('compras')" id="nav-compras">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.4 5.6A1 1 0 007 20h10a1 1 0 00.96-1.28L16 13M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/></svg>
+        <span>Compras</span>
+        <span class="nav-badge" id="badge-compras">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('seguimiento')" id="nav-seguimiento">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Concentrado</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <span id="sb-name" style="display:none"></span>
+      <span id="sb-role" style="display:none"></span>
+      <select id="role-switcher" style="display:none" onchange="switchRole(this.value)">
+        <option value="solicitante">Solicitante</option>
+        <option value="jefe">Jefe directo</option>
+        <option value="compras">Compras</option>
+      </select>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)" id="sidebar-user-name">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="sidebar-user-email">—</div>
+      </div>
+      <button class="btn-ghost" style="width:100%;margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px" onclick="showCambiarPassModal(false)">
+        <svg style="width:14px;height:14px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        Cambiar contraseña
+      </button>
+      <button class="btn-secondary" style="width:100%;margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center" onclick="doLogout()">
+        <svg style="width:16px;height:16px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title" id="topbar-title">Nueva requisición</span>
+      <div class="user-chip">
+        <button class="notif-btn" id="notif-btn" onclick="toggleNotifPanel()" title="Notificaciones">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-dot" id="notif-badge"></span>
+        </button>
+        <span id="topbar-role" style="display:none"></span>
+        <div class="avatar" id="topbar-avatar">—</div>
+        <span id="topbar-user" style="font-size:13px;color:var(--text2)"></span>
+      </div>
+    </div>
+
+    <!-- Panel notificaciones (position:fixed) -->
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-header">
+        <span>Notificaciones</span>
+        <button class="notif-mark-all" onclick="markAllRead()">Marcar como leídas</button>
+      </div>
+      <div id="notif-list" style="max-height:380px;overflow-y:auto"></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ NUEVA REQUISICIÓN ═══ -->
+      <div class="page active" id="sec-nueva">
+        <div id="nueva-form">
+          <div class="form-card">
+            <div class="form-card-title">Datos generales</div>
+            <div class="form-grid three">
+              <div class="field"><label>VIN / Número de proyecto</label><input id="req-vin" placeholder="Ej. 3114-DEVLYN"></div>
+              <div class="field"><label>Nombre del proyecto</label><input id="req-proyecto" placeholder="Ej. DEVLYN PABELLÓN BOSQUES"></div>
+              <div class="field"><label>Nombre del solicitante</label><input id="req-solicitante" placeholder="Nombre completo"></div>
+              <div class="field"><label>Área solicitante</label>
+                <select id="req-area">
+                  <option value="">— Selecciona —</option>
+                  <option>NOC</option><option>Operaciones</option><option>Ventas</option>
+                  <option>TI</option><option>Administración</option><option>RRHH</option><option>Otra</option>
+                </select>
+              </div>
+              <div class="field" style="display:none"><label>Jefe directo</label><input id="req-jefe" value="Fernando Olea"></div>
+              <div class="field form-full">
+                <label>Dirección de entrega</label>
+                <select id="req-dir-select" onchange="onDirSelectChange()">
+                  <option value="">— Selecciona una dirección —</option>
+                  <option value="darwin">Darwin 74, Piso 5 Anzures, CP 11590, Delegación Miguel Hidalgo, CDMX</option>
+                  <option value="colosio">Blvd. Luis Donaldo Colosio 619 Int. 503, Col. Santa Fe, Entre Calle Las Cruces y Blvd. Las Quintas, Hermosillo, Sonora, C.P. 83249</option>
+                  <option value="otra">Otra dirección...</option>
+                </select>
+              </div>
+              <div id="req-dir-custom" class="form-full" style="display:none">
+                <div class="form-grid three" style="margin-top:6px">
+                  <div class="field"><label>Calle</label><input id="req-dir-calle" placeholder="Nombre de la calle"></div>
+                  <div class="field"><label>Número exterior</label><input id="req-dir-next" placeholder="Ej. 123"></div>
+                  <div class="field"><label>Número interior</label><input id="req-dir-nint" placeholder="Ej. 5A (opcional)"></div>
+                  <div class="field"><label>Colonia</label><input id="req-dir-colonia" placeholder="Nombre de la colonia"></div>
+                  <div class="field"><label>Ciudad</label><input id="req-dir-ciudad" placeholder="Ciudad"></div>
+                  <div class="field"><label>Estado</label><input id="req-dir-estado" placeholder="Estado"></div>
+                  <div class="field"><label>Código postal</label><input id="req-dir-cp" placeholder="Ej. 11590" maxlength="5"></div>
+                </div>
+              </div>
+              <div class="field form-full"><label>Especificaciones / Restricciones</label>
+                <textarea id="req-specs" placeholder="Ej. Color blanco, solo comprar en Pato Baeza, voltaje 127V, etc."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-card-title">Artículos solicitados</div>
+            <div class="rows-wrap" style="overflow-x:auto">
+              <div class="rows-head" style="grid-template-columns:50px 70px 90px 1fr 180px 36px;min-width:600px">
+                <span>Art.</span><span>Cant.</span><span>Unidad</span><span>Descripción</span><span>Enlace de referencia</span><span></span>
+              </div>
+              <div id="art-rows"></div>
+            </div>
+            <button class="btn-add" onclick="addArtRow()">+ Agregar artículo</button>
+            <div class="form-actions">
+              <button class="btn-secondary" onclick="saveDraftReq()">Guardar borrador</button>
+              <button class="btn-primary" onclick="submitReq()">
+                <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                Enviar a aprobación
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ APROBACIONES ═══ -->
+      <div class="page" id="sec-aprobaciones">
+        <div id="aprobaciones-list"></div>
+      </div>
+
+      <!-- ═══ COMPRAS ═══ -->
+      <div class="page" id="sec-compras">
+        <div class="metrics" id="compras-metrics" style="grid-template-columns:repeat(3,1fr)"></div>
+        <div class="filters" style="margin-bottom:20px">
+          <select class="filter-select" id="compras-filter-fecha" onchange="renderCompras()">
+            <option value="">Todas las fechas</option>
+          </select>
+          <select class="filter-select" id="compras-filter-status" onchange="renderCompras()">
+            <option value="">Todos los estatus</option>
+            <option value="aprobada">Por entregar</option>
+            <option value="parcial">Entrega parcial</option>
+          </select>
+          <select class="filter-select" id="compras-filter-prio" onchange="renderCompras()">
+            <option value="">Todas las prioridades</option>
+            <option value="alto">🔴 Alta</option>
+            <option value="medio">🟡 Media</option>
+            <option value="bajo">🟢 Baja</option>
+          </select>
+          <input class="search-input" id="compras-search" placeholder="Buscar por VIN o proyecto..." oninput="renderCompras()" style="flex:1;min-width:220px">
+        </div>
+        <div id="compras-list"></div>
+      </div>
+
+      <!-- ═══ CONCENTRADO ═══ -->
+      <div class="page" id="sec-seguimiento">
+        <div class="metrics" id="seg-metrics" style="grid-template-columns:repeat(4,1fr)"></div>
+        <div class="filters" style="margin-bottom:20px">
+          <select class="filter-select" id="seg-filter-fecha" onchange="renderSeguimiento()">
+            <option value="">Todas las fechas</option>
+          </select>
+          <select class="filter-select" id="seg-filter-status" onchange="renderSeguimiento()">
+            <option value="">Todos los estatus</option>
+            <option value="aprobada">Por entregarse</option>
+            <option value="parcial">Entrega parcial</option>
+            <option value="entregada">Entregada</option>
+          </select>
+          <select class="filter-select" id="seg-filter-prio" onchange="renderSeguimiento()">
+            <option value="">Todas las prioridades</option>
+            <option value="alto">🔴 Alta</option>
+            <option value="medio">🟡 Media</option>
+            <option value="bajo">🟢 Baja</option>
+          </select>
+          <input class="search-input" placeholder="Buscar por VIN, proyecto o solicitante..." oninput="renderSeguimiento()" id="seg-search" style="flex:1;min-width:220px">
+          <button class="btn-secondary" onclick="exportConcentradoCSV()" style="white-space:nowrap;display:flex;align-items:center;gap:6px">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+            Exportar CSV
+          </button>
+        </div>
+        <div class="form-card" style="padding:0;overflow:hidden">
+          <table class="data-table">
+            <thead><tr>
+              <th></th><th>Folio</th><th>VIN</th><th>Proyecto</th><th>Solicitante</th>
+              <th>Área</th><th>Prioridad</th><th>Estatus</th><th>F. Estimada</th>
+            </tr></thead>
+            <tbody id="seg-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ MIS SOLICITUDES ═══ -->
+      <div class="page" id="sec-mis">
+        <div class="metrics" id="mis-metrics" style="grid-template-columns:repeat(4,1fr)"></div>
+        <div class="type-tabs" id="mis-tabs" style="margin-bottom:16px">
+          <button class="type-tab active" onclick="setMisFilter('')">Todas</button>
+          <button class="type-tab" onclick="setMisFilter('pendiente')">Por aprobar</button>
+          <button class="type-tab" onclick="setMisFilter('parcial')">Entrega parcial</button>
+          <button class="type-tab" onclick="setMisFilter('entregada')">Entregadas</button>
+          <button class="type-tab" onclick="setMisFilter('rechazada')">Rechazadas</button>
+        </div>
+        <div class="filters" style="margin-bottom:20px">
+          <select class="filter-select" id="mis-filter-fecha" onchange="renderMis()">
+            <option value="">Todas las fechas</option>
+          </select>
+          <input class="search-input" id="mis-search" placeholder="Buscar por VIN o proyecto..." oninput="renderMis()" style="flex:1;min-width:220px">
+        </div>
+        <div id="mis-list"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ─── CONFIGURACIÓN API ────────────────────────────────────────────────────
+  // Cambia esta URL a la de tu servidor cuando lo despliegues
+  const API_BASE = '/api';
+
+  const ROLE_LABELS = { solicitante:'Solicitante', jefe:'Jefe de área', compras:'Compras' };
+
+  let CURRENT_USER = null;
+  let db           = [];   // caché local — se llena desde la API
+  let notifications = [];
+  let _authToken   = null; // JWT guardado en memoria (no localStorage)
+
+  // ─── API HELPER ───────────────────────────────────────────────────────────
+  async function api(path, options = {}) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (_authToken) headers['Authorization'] = 'Bearer ' + _authToken;
+    const res = await fetch(API_BASE + path, { ...options, headers });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Error del servidor');
+    return json.data;
+  }
+
+  // ─── LOGIN / LOGOUT ──────────────────────────────────────────────────────
+  function getInitials(name) {
+    return (name||'').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('');
+  }
+
+  async function doLogin() {
+    const email  = (document.getElementById('login-email').value || '').trim().toLowerCase();
+    const pass   = document.getElementById('login-pass').value;
+    const errEl  = document.getElementById('login-error');
+    const btnEl  = document.getElementById('login-btn');
+
+    if (!email || !pass) { errEl.textContent = 'Ingresa tu correo y contraseña.'; errEl.style.display = 'block'; return; }
+
+    // Deshabilitar botón mientras carga
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Ingresando…'; }
+    errEl.style.display = 'none';
+
+    try {
+      const data = await api('/login.php', {
+        method: 'POST',
+        body: JSON.stringify({ email, password: pass }),
+      });
+
+      _authToken   = data.token;
+      const user   = data.usuario;
+      CURRENT_USER = {
+        email:  user.email,
+        name:   user.nombre,
+        area:   user.area,
+        jefe:   user.jefe,
+        role:   user.rol,
+        id:     user.id,
+      };
+
+      // Cargar datos desde la API
+      await loadDB();
+
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = '';
+      document.getElementById('sidebar-user-name').textContent  = user.nombre;
+      document.getElementById('sidebar-user-email').textContent = user.email;
+      const rs = document.getElementById('role-switcher');
+      if (rs) rs.value = user.rol;
+      switchRole(user.rol);
+      prefillForm();
+
+      // Iniciar polling de notificaciones cada 15s
+      startNotifPolling();
+
+      // Si es primer login, forzar cambio de contraseña
+      if (user.debeCambiarPass) showCambiarPassModal(true);
+
+    } catch (err) {
+      errEl.textContent = err.message === 'Credenciales incorrectas' ? 'Correo o contraseña incorrectos.' : 'Error de conexión. Intenta de nuevo.';
+      errEl.style.display = 'block';
+      document.getElementById('login-pass').value = '';
+    } finally {
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Ingresar'; }
+    }
+  }
+
+  function doLogout() {
+    _authToken   = null;
+    CURRENT_USER = null;
+    db           = [];
+    notifications = [];
+    stopNotifPolling();
+    document.getElementById('app').style.display         = 'none';
+    document.getElementById('login-screen').style.display = '';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-pass').value  = '';
+    document.getElementById('login-error').style.display = 'none';
+  }
+
+  // ─── CAMBIAR CONTRASEÑA ───────────────────────────────────────────────────
+  function showCambiarPassModal(forzado = false) {
+    removeModal();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'modal-main';
+    overlay.innerHTML = `
+      <div class="modal-box" style="max-width:400px">
+        <div class="modal-title">${forzado ? '🔐 Crea tu contraseña' : 'Cambiar contraseña'}</div>
+        <div class="modal-sub">${forzado
+          ? 'Es tu primer ingreso. Crea una contraseña personal para continuar.'
+          : 'Ingresa tu contraseña actual y elige una nueva.'}</div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Contraseña actual</label>
+          <input type="password" id="cp-actual" placeholder="${forzado ? 'voxpop2026' : 'Tu contraseña actual'}"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:var(--font-sans);font-size:13px">
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Nueva contraseña</label>
+          <input type="password" id="cp-nueva" placeholder="Mínimo 6 caracteres"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:var(--font-sans);font-size:13px">
+        </div>
+        <div class="field" style="margin-bottom:18px">
+          <label>Confirmar nueva contraseña</label>
+          <input type="password" id="cp-confirmar" placeholder="Repite la nueva contraseña"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:var(--font-sans);font-size:13px">
+        </div>
+        <div id="cp-error" style="display:none;background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-text);border-radius:var(--radius);padding:9px 12px;font-size:13px;margin-bottom:14px"></div>
+        <div class="modal-actions">
+          ${forzado ? '' : '<button class="btn-ghost" onclick="removeModal()">Cancelar</button>'}
+          <button class="btn-sm btn-approve" style="padding:8px 20px" onclick="confirmarCambioPass(${forzado})">
+            Guardar contraseña
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    // Si es forzado, no se puede cerrar haciendo clic afuera
+    if (!forzado) overlay.addEventListener('click', e => { if (e.target === overlay) removeModal(); });
+    setTimeout(() => document.getElementById('cp-actual')?.focus(), 50);
+  }
+
+  async function confirmarCambioPass(forzado) {
+    const actual    = document.getElementById('cp-actual').value;
+    const nueva     = document.getElementById('cp-nueva').value;
+    const confirmar = document.getElementById('cp-confirmar').value;
+    const errEl     = document.getElementById('cp-error');
+
+    errEl.style.display = 'none';
+
+    if (!actual || !nueva || !confirmar) {
+      errEl.textContent = 'Todos los campos son requeridos.';
+      errEl.style.display = 'block'; return;
+    }
+    if (nueva !== confirmar) {
+      errEl.textContent = 'Las contraseñas nuevas no coinciden.';
+      errEl.style.display = 'block'; return;
+    }
+    if (nueva.length < 6) {
+      errEl.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.';
+      errEl.style.display = 'block'; return;
+    }
+
+    try {
+      await api('/cambiar_pass.php', {
+        method: 'POST',
+        body: JSON.stringify({ actual, nueva, confirmar }),
+      });
+      removeModal();
+      showToast('✓ Contraseña actualizada correctamente');
+    } catch(e) {
+      errEl.textContent = e.message;
+      errEl.style.display = 'block';
+    }
+  }
+
+  function prefillForm() {
+    if (!CURRENT_USER) return;
+    const { name, area, jefe } = CURRENT_USER;
+    const sol = document.getElementById('req-solicitante'); if (sol) sol.value = name;
+    const jf  = document.getElementById('req-jefe');        if (jf)  { jf.value = jefe; jf.readOnly = true; }
+    function setArea(id) {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      let found = false;
+      for (const opt of sel.options) { if (opt.value === area) { found = true; break; } }
+      if (!found) { const o = document.createElement('option'); o.value = area; o.textContent = area; sel.appendChild(o); }
+      sel.value = area;
+    }
+    setArea('req-area');
+  }
+
+  // ─── SELECTOR DE ROL ──────────────────────────────────────────────────────
+  function switchRole(role) {
+    if (!CURRENT_USER) return;
+    document.getElementById('sb-name').textContent      = CURRENT_USER.name;
+    document.getElementById('sb-role').textContent      = ROLE_LABELS[role];
+    document.getElementById('topbar-user').textContent  = CURRENT_USER.name;
+    document.getElementById('topbar-role').textContent  = ROLE_LABELS[role];
+    document.getElementById('topbar-avatar').textContent = getInitials(CURRENT_USER.name);
+    prefillForm();
+    applyRoleVisibility();
+    updateBadges();
+    updateNotifBadge();
+    const section = role === 'jefe' ? 'aprobaciones' : role === 'compras' ? 'compras' : 'nueva';
+    showSection(section);
+  }
+
+  function applyRoleVisibility() {
+    const role = CURRENT_USER ? CURRENT_USER.role : 'solicitante';
+    const show = (id, visible) => { const el = document.getElementById(id); if(el) el.style.display = visible ? '' : 'none'; };
+    show('nav-nueva',        true);
+    show('nav-aprobaciones', role === 'jefe');
+    show('nav-compras',      role === 'compras');
+    show('nav-seguimiento',  role === 'compras');
+    show('nav-mis',          true);
+  }
+
+  // ─── PERSISTENCIA — reemplaza localStorage con API ───────────────────────
+  async function loadDB() {
+    try {
+      db = await api('/requisiciones.php');
+      // normalizar campos para compatibilidad con renders existentes
+      db = db.map(normalizeReq);
+    } catch(e) {
+      console.error('Error cargando datos:', e);
+      db = [];
+    }
+  }
+
+  // Convierte nombres de columnas MySQL (snake_case) a los que usa el JS (camelCase)
+  function normalizeReq(r) {
+    return {
+      ...r,
+      folio:            r.folio,
+      vin:              r.vin,
+      proyecto:         r.proyecto,
+      solicitante:      r.solicitante,
+      area:             r.area,
+      jefe:             r.jefe,
+      direccion:        r.direccion,
+      specs:            r.specs,
+      status:           r.status,
+      prioridad:        r.prioridad,
+      fechaReq:         r.fecha_req        || '',
+      fechaEstimada:    r.fecha_estimada   || '',
+      fechaEntrega:     r.fecha_entrega    || '',
+      fechaCierre:      r.fecha_cierre     || '',
+      aprobadaPor:      r.aprobada_por     || '',
+      aprobadaAt:       r.aprobada_en      || '',
+      comentariosJefe:  r.comentarios_jefe || '',
+      rechazadaPor:     r.rechazada_por    || '',
+      rechazadaAt:      r.rechazada_en     || '',
+      motivoRechazo:    r.motivo_rechazo   || '',
+      entregaNotas:     r.entrega_notas    || '',
+      motivoParcial:    r.motivo_parcial   || '',
+      encuesta:         r.encuesta         || '',
+      proveedorElegido: r.proveedor_elegido|| '',
+      createdAt:        r.creado_en        || '',
+      createdBy:        r.creado_email     || '',
+      arts:             (r.arts || []).map(a => ({
+        id:    a.id,
+        cant:  parseFloat(a.cantidad),
+        unidad:a.unidad,
+        desc:  a.descripcion,
+        link:  a.link || '',
+        cantEntregada: a.cantidad_entregada != null ? parseFloat(a.cantidad_entregada) : null,
+        entregado:     a.entregado != null ? !!a.entregado : null,
+      })),
+      proveedores: (r.proveedores || []).map(p => ({
+        nombre: p.nombre_proveedor,
+        precio: p.precio,
+        notas:  p.notas || '',
+      })),
+      ordenCompra: r.ordenCompra ? {
+        proveedor:    r.ordenCompra.proveedor,
+        monto:        r.ordenCompra.monto,
+        folioFactura: r.ordenCompra.folio_factura || '',
+        fechaCompra:  r.ordenCompra.fecha_compra  || '',
+        fechaPago:    r.ordenCompra.fecha_pago     || '',
+        fechaAlmacen: r.ordenCompra.fecha_almacen  || '',
+      } : null,
+    };
+  }
+
+  // Refresca solo la requisición que cambió (no recarga todo)
+  async function reloadReq(folio) {
+    try {
+      const updated = await api(`/requisicion.php?folio=${folio}`);
+      const norm    = normalizeReq(updated);
+      const idx     = db.findIndex(r => r.folio === folio);
+      if (idx >= 0) db[idx] = norm; else db.push(norm);
+    } catch(e) { console.error('Error recargando req:', e); }
+  }
+
+  // saveDB ya no existe — cada acción llama directamente a la API
+  function saveDB() { /* no-op: datos se guardan en MySQL via API */ }
+
+  // ─── NAVEGACIÓN ───────────────────────────────────────────────────────────
+  const SECTION_TITLES = { nueva:'Nueva requisición', aprobaciones:'Aprobaciones pendientes', compras:'Gestión de compras', seguimiento:'Concentrado', mis:'Mis solicitudes' };
+
+  function showSection(name) {
+    document.querySelectorAll('.page').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec-'+name).classList.add('active');
+    document.getElementById('nav-'+name).classList.add('active');
+    document.getElementById('topbar-title').textContent = SECTION_TITLES[name];
+    renderAll();
+  }
+
+  function renderAll() {
+    renderAprobaciones();
+    renderCompras();
+    renderSeguimiento();
+    renderMis();
+    updateBadges();
+  }
+
+  // ─── FOLIO ────────────────────────────────────────────────────────────────
+  function genFolio() {
+    const n = String(folioCounter++).padStart(4, '0');
+    return 'REQ-' + n;
+  }
+
+  function today() { return new Date().toISOString().slice(0,10); }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    const [y,m,dd] = d.split('-');
+    return `${dd}/${m}/${y}`;
+  }
+
+  // ─── ARTÍCULOS ROWS ───────────────────────────────────────────────────────
+  function addArtRow() {
+    const cont = document.getElementById('art-rows');
+    const idx = cont.querySelectorAll('.row-item').length + 1;
+    const div = document.createElement('div');
+    div.className = 'row-item';
+    div.style.gridTemplateColumns = '50px 70px 90px 1fr 180px 36px';
+    div.style.minWidth = '600px';
+    div.innerHTML = `
+      <span style="font-size:12px;color:var(--text3);text-align:center">${idx}</span>
+      <input type="number" placeholder="1" min="1" class="art-cant">
+      <input placeholder="pza / m / kg" class="art-unidad">
+      <input placeholder="Descripción detallada del artículo" class="art-desc">
+      <input placeholder="https://..." class="art-link">
+      <button class="btn-del" onclick="this.parentElement.remove();renumArt()" title="Eliminar">✕</button>`;
+    cont.appendChild(div);
+  }
+
+  function renumArt() {
+    document.querySelectorAll('#art-rows .row-item').forEach((r, i) => {
+      const span = r.querySelector('span');
+      if (span) span.textContent = i + 1;
+    });
+  }
+
+  // ─── DIRECCIÓN ────────────────────────────────────────────────────────────
+  function onDirSelectChange() {
+    const val = document.getElementById('req-dir-select').value;
+    document.getElementById('req-dir-custom').style.display = val === 'otra' ? '' : 'none';
+  }
+
+  function getAddressValue() {
+    const sel = document.getElementById('req-dir-select').value;
+    if (sel === 'darwin')  return 'Darwin 74, Piso 5 Anzures, CP 11590, Delegación Miguel Hidalgo, CDMX';
+    if (sel === 'colosio') return 'Blvd. Luis Donaldo Colosio 619 Int. 503, Col. Santa Fe, Entre Calle Las Cruces y Blvd. Las Quintas, Hermosillo, Sonora, C.P. 83249';
+    if (sel === 'otra') {
+      const calle   = document.getElementById('req-dir-calle').value.trim();
+      const next    = document.getElementById('req-dir-next').value.trim();
+      const nint    = document.getElementById('req-dir-nint').value.trim();
+      const colonia = document.getElementById('req-dir-colonia').value.trim();
+      const ciudad  = document.getElementById('req-dir-ciudad').value.trim();
+      const estado  = document.getElementById('req-dir-estado').value.trim();
+      const cp      = document.getElementById('req-dir-cp').value.trim();
+      return [
+        calle + (next ? ' ' + next : ''),
+        nint    ? 'Int. ' + nint    : '',
+        colonia ? 'Col. ' + colonia : '',
+        ciudad, estado,
+        cp      ? 'C.P. ' + cp      : '',
+      ].filter(Boolean).join(', ');
+    }
+    return '';
+  }
+
+  // ─── VALIDACIÓN ───────────────────────────────────────────────────────────
+  function validarReq() {
+    const errors = [];
+    const req = (id, label) => {
+      const el = document.getElementById(id);
+      if (!el || !el.value.trim()) errors.push({ msg: label, focusId: id });
+    };
+    req('req-vin',        'VIN / Número de proyecto');
+    req('req-proyecto',   'Nombre del proyecto');
+    req('req-solicitante','Nombre del solicitante');
+    req('req-jefe',       'Jefe directo');
+    const area = document.getElementById('req-area');
+    if (!area.value) errors.push({ msg: 'Área solicitante', focusId: 'req-area' });
+    const dirSel = document.getElementById('req-dir-select');
+    if (!dirSel.value) {
+      errors.push({ msg: 'Dirección de entrega', focusId: 'req-dir-select' });
+    } else if (dirSel.value === 'otra') {
+      req('req-dir-calle',   'Dirección — Calle');
+      req('req-dir-next',    'Dirección — Número exterior');
+      req('req-dir-colonia', 'Dirección — Colonia');
+      req('req-dir-ciudad',  'Dirección — Ciudad');
+      req('req-dir-estado',  'Dirección — Estado');
+      req('req-dir-cp',      'Dirección — Código postal');
+    }
+
+    const arts = Array.from(document.querySelectorAll('#art-rows .row-item'));
+    const validos = arts.filter(r => r.querySelector('.art-desc')?.value.trim() && parseFloat(r.querySelector('.art-cant')?.value) > 0);
+    if (!validos.length) errors.push({ msg: 'Agrega al menos un artículo con cantidad y descripción', focusSelector: '#art-rows .art-desc' });
+
+    return errors;
+  }
+
+  function mostrarErroresReq(errors) {
+    const form = document.getElementById('nueva-form');
+    const old = form.querySelector('.validation-panel');
+    if (old) old.remove();
+    if (!errors.length) return;
+
+    const panel = document.createElement('div');
+    panel.className = 'validation-panel';
+    panel.innerHTML = `
+      <div class="vp-header">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        <strong>Faltan ${errors.length} campo${errors.length>1?'s':''} por completar</strong>
+      </div>
+      <ul class="vp-list">
+        ${errors.map((e,i)=>`<li class="vp-item" data-idx="${i}">· ${e.msg}</li>`).join('')}
+      </ul>`;
+    form.insertBefore(panel, form.firstChild);
+    panel.querySelectorAll('.vp-item').forEach((li, i) => {
+      const e = errors[i];
+      li.addEventListener('click', () => {
+        const t = e.focusEl || (e.focusId && document.getElementById(e.focusId)) || (e.focusSelector && document.querySelector(e.focusSelector));
+        if (t) { t.scrollIntoView({ behavior:'smooth', block:'center' }); t.focus(); t.classList.add('field-highlight'); setTimeout(()=>t.classList.remove('field-highlight'),1800); }
+      });
+    });
+    panel.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  // ─── SUBMIT ───────────────────────────────────────────────────────────────
+  function getReqData() {
+    const arts = [];
+    document.querySelectorAll('#art-rows .row-item').forEach(r => {
+      arts.push({
+        cant: parseFloat(r.querySelector('.art-cant')?.value) || 0,
+        unidad: r.querySelector('.art-unidad')?.value || '',
+        desc: r.querySelector('.art-desc')?.value || '',
+        link: r.querySelector('.art-link')?.value || '',
+      });
+    });
+    return {
+      vin: document.getElementById('req-vin').value,
+      proyecto: document.getElementById('req-proyecto').value,
+      solicitante: document.getElementById('req-solicitante').value,
+      area: document.getElementById('req-area').value,
+      jefe: document.getElementById('req-jefe').value,
+      direccion: getAddressValue(),
+      specs: document.getElementById('req-specs').value,
+      arts,
+      status: 'pendiente',
+      createdAt: new Date().toISOString(),
+      createdBy: CURRENT_USER.email,
+    };
+  }
+
+  async function saveDraftReq() {
+    const errors = validarReq();
+    mostrarErroresReq(errors);
+    if (errors.length) return;
+    const data = { ...getReqData(), status: 'borrador' };
+    try {
+      await api('/requisiciones.php', { method:'POST', body: JSON.stringify(data) });
+      await loadDB();
+      showToast('Borrador guardado — ' + data.folio);
+      resetNuevaForm();
+      updateBadges();
+    } catch(e) { showToast('Error al guardar: ' + e.message); }
+  }
+
+  async function submitReq() {
+    const errors = validarReq();
+    mostrarErroresReq(errors);
+    if (errors.length) return;
+    mostrarErroresReq([]);
+    const data = getReqData();
+    try {
+      const nueva = await api('/requisiciones.php', { method:'POST', body: JSON.stringify(data) });
+      db.push(normalizeReq(nueva));
+      showToast('✓ Requisición ' + nueva.folio + ' enviada a aprobación');
+      resetNuevaForm();
+      updateBadges();
+      renderAll();
+    } catch(e) { showToast('Error al enviar: ' + e.message); }
+  }
+
+  function resetNuevaForm() {
+    ['req-vin','req-proyecto','req-specs'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('req-area').value = '';
+    document.getElementById('req-dir-select').value = '';
+    document.getElementById('req-dir-custom').style.display = 'none';
+    ['req-dir-calle','req-dir-next','req-dir-nint','req-dir-colonia','req-dir-ciudad','req-dir-estado','req-dir-cp'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('req-solicitante').value = CURRENT_USER?.name || '';
+    document.getElementById('art-rows').innerHTML = '';
+    addArtRow();
+    const old = document.getElementById('nueva-form').querySelector('.validation-panel');
+    if (old) old.remove();
+  }
+
+  // ─── BADGES ───────────────────────────────────────────────────────────────
+  function updateBadges() {
+    const pendAprobacion = db.filter(r => r.status === 'pendiente').length;
+    const pendCompras = db.filter(r => r.status === 'aprobada').length;
+    const ba = document.getElementById('badge-aprobaciones');
+    const bc = document.getElementById('badge-compras');
+    ba.textContent = pendAprobacion; ba.style.display = pendAprobacion > 0 ? 'inline' : 'none';
+    bc.textContent = pendCompras;    bc.style.display = pendCompras > 0 ? 'inline' : 'none';
+  }
+
+  // ─── APROBACIONES ─────────────────────────────────────────────────────────
+  function renderAprobaciones() {
+    if (CURRENT_USER?.role !== 'jefe') return;
+    const cont = document.getElementById('aprobaciones-list');
+    const pend = db.filter(r => r.status === 'pendiente');
+    if (!pend.length) {
+      cont.innerHTML = '<div class="empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Sin requisiciones pendientes de aprobación</div>';
+      return;
+    }
+    cont.innerHTML = '';
+    pend.forEach(req => {
+      const card = document.createElement('div');
+      card.className = 'req-card';
+      card.innerHTML = `
+        <div class="req-card-head">
+          <div class="req-card-left">
+            <span class="badge badge-pendiente">Pendiente</span>
+            <span class="req-folio">${req.folio}</span>
+            <span style="font-size:12px;color:var(--text3)">${fmtDate(req.createdAt?.slice(0,10))}</span>
+          </div>
+          <span style="font-size:12px;color:var(--text2)">${req.area||'—'}</span>
+        </div>
+        <div class="req-card-body">
+          <div><div class="req-info-label">Solicitante</div><div class="req-info-value">${req.solicitante}</div></div>
+          <div><div class="req-info-label">Proyecto</div><div class="req-info-value">${req.proyecto}</div></div>
+          <div><div class="req-info-label">VIN</div><div class="req-info-value" style="font-family:var(--font-mono)">${req.vin}</div></div>
+          <div><div class="req-info-label">Dirección de entrega</div><div class="req-info-value">${req.direccion||'—'}</div></div>
+          <div><div class="req-info-label">Artículos</div><div class="req-info-value">${req.arts?.length||0} artículo(s)</div></div>
+        </div>
+        ${req.specs ? `<div style="font-size:12px;color:var(--text2);background:var(--surface2);border-radius:6px;padding:8px 12px;margin-bottom:12px"><strong>Especificaciones:</strong> ${req.specs}</div>` : ''}
+        <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px">
+          <div style="display:grid;grid-template-columns:50px 60px 80px 1fr 160px;background:var(--surface2);padding:6px 12px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;gap:8px">
+            <span>Art.</span><span>Cant.</span><span>Unidad</span><span>Descripción</span><span>Enlace</span>
+          </div>
+          ${(req.arts||[]).map((a,i)=>`<div style="display:grid;grid-template-columns:50px 60px 80px 1fr 160px;padding:7px 12px;font-size:12px;border-top:1px solid var(--border);gap:8px;align-items:center">
+            <span style="color:var(--text3)">${i+1}</span>
+            <span>${a.cant}</span><span>${a.unidad||'—'}</span>
+            <span>${a.desc}</span>
+            <span>${a.link?`<a href="${a.link}" target="_blank" style="color:var(--blue-text);font-size:11px">Ver enlace</a>`:'—'}</span>
+          </div>`).join('')}
+        </div>
+        <div class="req-card-actions">
+          <button class="btn-sm btn-reject" onclick="showRechazarModal('${req.folio}')">✕ Rechazar</button>
+          <button class="btn-sm btn-approve" onclick="showAprobarModal('${req.folio}')">✓ Aprobar</button>
+        </div>`;
+      cont.appendChild(card);
+    });
+  }
+
+  function showAprobarModal(folio) {
+    removeModal();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay'; overlay.id = 'modal-main';
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-title">Aprobar requisición ${folio}</div>
+        <div class="modal-sub">Define la prioridad y fecha estimada de entrega.</div>
+        <div class="form-grid two" style="gap:14px">
+          <div class="field">
+            <label>Prioridad</label>
+            <select id="m-prioridad">
+              <option value="alto">🔴 Alta</option>
+              <option value="medio" selected>🟡 Media</option>
+              <option value="bajo">🟢 Baja</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Fecha estimada de entrega</label>
+            <input type="date" id="m-fecha-est">
+          </div>
+          <div class="field form-full">
+            <label>Comentarios (opcional)</label>
+            <textarea id="m-comentarios" placeholder="Instrucciones o notas para compras..."></textarea>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="removeModal()">Cancelar</button>
+          <button class="btn-sm btn-approve" style="padding:8px 20px" onclick="confirmarAprobacion('${folio}')">✓ Confirmar aprobación</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if(e.target===overlay) removeModal(); });
+  }
+
+  async function confirmarAprobacion(folio) {
+    const prio       = document.getElementById('m-prioridad').value;
+    const fecha      = document.getElementById('m-fecha-est').value;
+    const comentarios= document.getElementById('m-comentarios').value;
+    if (!fecha) { showToast('Indica la fecha estimada de entrega'); return; }
+    try {
+      await api(`/requisicion.php?folio=${folio}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ accion:'aprobar', prioridad:prio, fechaEstimada:fecha, comentarios }),
+      });
+      await reloadReq(folio);
+      removeModal();
+      updateBadges();
+      renderAll();
+      showToast('✓ Requisición ' + folio + ' aprobada');
+    } catch(e) { showToast('Error: ' + e.message); }
+  }
+
+  function showRechazarModal(folio) {
+    removeModal();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay'; overlay.id = 'modal-main';
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-title">Rechazar requisición ${folio}</div>
+        <div class="modal-sub">El solicitante recibirá una notificación con el motivo.</div>
+        <div class="field">
+          <label>Motivo del rechazo</label>
+          <textarea id="m-motivo" placeholder="Ej. Presupuesto insuficiente, especificaciones incompletas, proveedor no autorizado..." style="min-height:100px"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="removeModal()">Cancelar</button>
+          <button class="btn-sm btn-reject" style="padding:8px 20px" onclick="confirmarRechazo('${folio}')">✕ Confirmar rechazo</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if(e.target===overlay) removeModal(); });
+    setTimeout(()=>document.getElementById('m-motivo').focus(), 50);
+  }
+
+  async function confirmarRechazo(folio) {
+    const motivo = (document.getElementById('m-motivo').value||'').trim();
+    try {
+      await api(`/requisicion.php?folio=${folio}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ accion:'rechazar', motivo: motivo || 'Sin motivo especificado' }),
+      });
+      await reloadReq(folio);
+      removeModal();
+      updateBadges();
+      renderAll();
+      showToast('Requisición ' + folio + ' rechazada');
+    } catch(e) { showToast('Error: ' + e.message); }
+  }
+
+  // ─── COMPRAS ──────────────────────────────────────────────────────────────
+  function renderCompras() {
+    if (CURRENT_USER?.role !== 'compras') return;
+    const cont = document.getElementById('compras-list');
+
+    const todasC = db.filter(r => ['aprobada','parcial','entregada'].includes(r.status));
+    const cTotal     = todasC.length;
+    const cEntregar  = todasC.filter(r => r.status === 'aprobada').length;
+    const cEntregadas= todasC.filter(r => r.status === 'entregada').length;
+    const cParcial   = todasC.filter(r => r.status === 'parcial').length;
+
+    const metrics = document.getElementById('compras-metrics');
+    if (metrics) metrics.innerHTML = `
+      <div class="metric-card" style="cursor:pointer" onclick="setComprasStatusFilter('')">
+        <div class="metric-val">${cEntregar + cParcial}</div><div class="metric-label">Total pendientes</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setComprasStatusFilter('aprobada')">
+        <div class="metric-val" style="color:var(--amber-text)">${cEntregar}</div><div class="metric-label">Por entregar</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setComprasStatusFilter('parcial')">
+        <div class="metric-val" style="color:var(--blue-text)">${cParcial}</div><div class="metric-label">Entrega parcial</div></div>`;
+
+    // Poblar selector de mes/año
+    const fechaSel = document.getElementById('compras-filter-fecha');
+    if (fechaSel) {
+      const prev = fechaSel.value;
+      const meses = [...new Set(todasC.map(r => r.createdAt?.slice(0,7)).filter(Boolean))].sort().reverse();
+      fechaSel.innerHTML = '<option value="">Todas las fechas</option>' +
+        meses.map(m => {
+          const [y, mo] = m.split('-');
+          return `<option value="${m}"${m===prev?' selected':''}>${MESES_ES[parseInt(mo)-1]} ${y}</option>`;
+        }).join('');
+    }
+
+    const statusFiltro = document.getElementById('compras-filter-status')?.value || '';
+    const prioFiltro   = document.getElementById('compras-filter-prio')?.value   || '';
+    const fechaFiltro  = document.getElementById('compras-filter-fecha')?.value  || '';
+    const search       = (document.getElementById('compras-search')?.value || '').toLowerCase().trim();
+
+    let activas = todasC.filter(r => ['aprobada','parcial'].includes(r.status));
+    if (statusFiltro) activas = activas.filter(r => r.status === statusFiltro);
+    if (prioFiltro)   activas = activas.filter(r => r.prioridad === prioFiltro);
+    if (fechaFiltro)  activas = activas.filter(r => r.createdAt?.startsWith(fechaFiltro));
+    if (search)       activas = activas.filter(r =>
+      (r.vin||'').toLowerCase().includes(search) ||
+      (r.proyecto||'').toLowerCase().includes(search)
+    );
+
+    if (!activas.length) {
+      cont.innerHTML = '<div class="empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.4 5.6A1 1 0 007 20h10a1 1 0 00.96-1.28L16 13M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/></svg>Sin requisiciones pendientes de entrega</div>';
+      return;
+    }
+
+    cont.innerHTML = '';
+    activas.forEach(req => {
+      const card = document.createElement('div');
+      card.className = 'req-card';
+      const prioClass   = { alto:'prio-alto', medio:'prio-medio', bajo:'prio-bajo' }[req.prioridad] || '';
+      const statusBadge = { aprobada:'badge-aprobada', parcial:'badge-parcial' }[req.status] || '';
+      const statusLabel = { aprobada:'Por entregar', parcial:'Entrega parcial' }[req.status] || req.status;
+
+      const artsHtml = (req.arts||[]).map((a,i)=>`
+        <div style="display:grid;grid-template-columns:36px 56px 72px 1fr 140px;padding:8px 12px;font-size:12px;border-top:1px solid var(--border);gap:8px;align-items:center">
+          <span style="color:var(--text3)">${i+1}</span>
+          <span style="font-weight:500">${a.cant}</span>
+          <span>${a.unidad||'—'}</span>
+          <span>${a.desc}</span>
+          <span>${a.link?`<a href="${a.link}" target="_blank" style="color:var(--blue-text);font-size:11px;text-decoration:none">🔗 Ver enlace</a>`:'—'}</span>
+        </div>`).join('');
+
+      card.innerHTML = `
+        <div class="req-card-head">
+          <div class="req-card-left">
+            <span class="badge ${statusBadge}">${statusLabel}</span>
+            <span class="req-folio">${req.folio}</span>
+            ${req.prioridad?`<span class="${prioClass}">${req.prioridad.toUpperCase()}</span>`:''}
+          </div>
+          <span style="font-size:12px;color:var(--text2)">F. estimada: ${fmtDate(req.fechaEstimada)}</span>
+        </div>
+        <div class="req-card-body">
+          <div><div class="req-info-label">Proyecto</div><div class="req-info-value">${req.proyecto}</div></div>
+          <div><div class="req-info-label">Solicitante</div><div class="req-info-value">${req.solicitante}</div></div>
+          <div><div class="req-info-label">VIN</div><div class="req-info-value" style="font-family:var(--font-mono)">${req.vin}</div></div>
+          <div><div class="req-info-label">Dirección de entrega</div><div class="req-info-value">${req.direccion||'—'}</div></div>
+          ${req.comentariosJefe?`<div style="grid-column:1/-1"><div class="req-info-label">Notas del jefe</div><div class="req-info-value">${req.comentariosJefe}</div></div>`:''}
+          ${req.entregaNotas?`<div style="grid-column:1/-1"><div class="req-info-label">Notas entrega anterior</div><div class="req-info-value">${req.entregaNotas}</div></div>`:''}
+        </div>
+        ${req.specs?`<div style="font-size:12px;color:var(--text2);background:var(--surface2);border-radius:6px;padding:8px 12px;margin-bottom:12px"><strong>Especificaciones:</strong> ${req.specs}</div>`:''}
+        <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px">
+          <div style="display:grid;grid-template-columns:36px 56px 72px 1fr 140px;background:var(--surface2);padding:7px 12px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;gap:8px">
+            <span>#</span><span>Cant.</span><span>Unidad</span><span>Descripción</span><span>Enlace</span>
+          </div>
+          ${artsHtml}
+        </div>
+        <div class="req-card-actions">
+          <button class="btn-sm" style="background:var(--amber-bg);color:var(--amber-text)" onclick="showEntregaModal('${req.folio}','parcial')">📦 Entrega parcial</button>
+          <button class="btn-sm btn-approve" onclick="showEntregaModal('${req.folio}','entregada')">✓ Marcar como entregada</button>
+        </div>`;
+      cont.appendChild(card);
+    });
+  }
+
+  function actualizarEstadoArt(i, cantMax) {
+    const chk   = document.getElementById(`art-chk-${i}`);
+    const cant  = parseFloat(document.getElementById(`art-cant-${i}`)?.value) || 0;
+    const badge = document.getElementById(`art-badge-${i}`);
+    const row   = document.getElementById(`art-row-${i}`);
+    if (!chk || !badge) return;
+    if (!chk.checked) {
+      badge.className = 'badge badge-pendiente'; badge.textContent = 'Pendiente';
+      if (row) row.style.opacity = '.45';
+    } else if (cant < cantMax) {
+      badge.className = 'badge badge-compras'; badge.textContent = 'Entrega parcial';
+      if (row) row.style.opacity = '1';
+    } else {
+      badge.className = 'badge badge-entregada'; badge.textContent = 'Entregado';
+      if (row) row.style.opacity = '1';
+    }
+  }
+
+  function validarCantArt(input, max, i) {
+    const msg    = document.getElementById(`art-cant-msg-${i}`);
+    const excede = +input.value > max;
+    input.style.borderColor = excede ? 'var(--red-text)' : 'var(--border)';
+    input.style.background  = excede ? 'var(--red-bg)'   : 'var(--surface)';
+    if (msg) msg.style.display = excede ? 'block' : 'none';
+    actualizarEstadoArt(i, max);
+  }
+
+  function onArtChkChange(i, cantMax) {
+    actualizarEstadoArt(i, cantMax);
+  }
+
+  function showEntregaModal(folio, tipo) {
+    removeModal();
+    const req = db.find(r => r.folio === folio);
+    const esParcial = tipo === 'parcial';
+    const esSegundaEntrega = req?.status === 'parcial';
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay'; overlay.id = 'modal-main';
+
+    const artsRows = (req?.arts||[]).map((a,i) => {
+      const yaEntregado = esSegundaEntrega && (a.entregado === true || (a.cantEntregada != null && a.cantEntregada >= a.cant));
+      const cantPendiente = (esSegundaEntrega && a.cantEntregada != null) ? Math.max(0, a.cant - a.cantEntregada) : a.cant;
+
+      if (yaEntregado) {
+        return `
+          <tr id="art-row-${i}" style="opacity:.4;background:var(--surface2)">
+            <td style="padding:10px 14px;text-align:center;width:44px">
+              <input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:var(--accent)">
+            </td>
+            <td style="padding:8px 14px;width:160px">
+              <span style="font-size:12px;font-weight:500;color:var(--text2)">${a.cantEntregada ?? a.cant} ${a.unidad||''}</span>
+            </td>
+            <td style="padding:10px 14px;font-size:13px;color:var(--text2);line-height:1.4">
+              ${a.desc}
+              ${a.link?`<br><a href="${a.link}" target="_blank" style="color:var(--blue-text);font-size:11px;text-decoration:none">🔗 Ver enlace</a>`:''}
+            </td>
+            <td style="padding:10px 14px;text-align:center;width:110px">
+              <span class="badge badge-entregada">Ya entregado</span>
+            </td>
+          </tr>`;
+      }
+
+      const checked   = !esParcial;
+      const badgeCls  = checked ? 'badge badge-entregada' : 'badge badge-parcial';
+      const badgeTxt  = checked ? 'Entregado' : 'Pendiente';
+      const rowOpacity= checked ? '1' : '.45';
+      return `
+        <tr id="art-row-${i}" style="transition:opacity .15s;opacity:${rowOpacity}">
+          <td style="padding:10px 14px;text-align:center;width:44px">
+            <input type="checkbox" id="art-chk-${i}" ${checked?'checked':''}
+              onchange="onArtChkChange(${i},${cantPendiente})"
+              style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
+          </td>
+          <td style="padding:8px 14px;width:160px">
+            <div style="position:relative;display:inline-flex;align-items:center;gap:5px">
+              <div id="art-cant-msg-${i}" style="display:none;position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:5px 10px;border-radius:7px;font-size:10px;font-weight:600;white-space:nowrap;z-index:30;box-shadow:var(--shadow-lg);pointer-events:none;letter-spacing:.2px">
+                Máx. permitido: ${cantPendiente} ${a.unidad||'pza'}
+                <span style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid var(--text)"></span>
+              </div>
+              <input type="number" id="art-cant-${i}" value="${cantPendiente}" min="0"
+                oninput="validarCantArt(this,${cantPendiente},${i})"
+                style="width:60px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font-sans);text-align:center;background:var(--surface);transition:border-color .15s,background .15s">
+              <span style="font-size:12px;color:var(--text2)">${a.unidad||''}</span>
+            </div>
+          </td>
+          <td style="padding:10px 14px;font-size:13px;color:var(--text);line-height:1.4">
+            ${a.desc}
+            ${a.link?`<br><a href="${a.link}" target="_blank" style="color:var(--blue-text);font-size:11px;text-decoration:none">🔗 Ver enlace</a>`:''}
+          </td>
+          <td style="padding:10px 14px;text-align:center;width:110px">
+            <span class="${badgeCls}" id="art-badge-${i}">${badgeTxt}</span>
+          </td>
+        </tr>`;
+    }).join('');
+
+    overlay.innerHTML = `
+      <div class="modal-box" style="max-width:660px">
+        <div class="modal-title">${esParcial?'Entrega parcial':'Marcar como entregada'} — ${folio}</div>
+        <div class="modal-sub">${esSegundaEntrega
+          ? 'Los artículos bloqueados ya fueron entregados antes. Selecciona y ajusta solo los artículos pendientes.'
+          : esParcial
+          ? 'Selecciona los artículos que se entregan y ajusta la cantidad si es necesario.'
+          : 'Confirma los artículos entregados. Puedes ajustar cantidades si aplica.'
+        }</div>
+
+        ${esSegundaEntrega ? `<div style="font-size:12px;color:var(--amber-text);background:var(--amber-bg);border:1px solid var(--amber-text);border-radius:var(--radius);padding:8px 12px;margin-bottom:14px">
+          ⚠ Esta requisición ya tiene una entrega parcial previa. Solo puedes entregar los artículos pendientes.
+        </div>` : ''}
+
+        <div style="margin-bottom:6px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px">
+          Artículos — Marca los que entregas ahora
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:visible;margin-bottom:8px">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="background:var(--surface2)">
+                <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;width:44px">✓</th>
+                <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;width:110px">Cantidad</th>
+                <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Artículo</th>
+                <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;width:110px">Estado</th>
+              </tr>
+            </thead>
+            <tbody style="border-top:1px solid var(--border);overflow:visible">
+              ${artsRows||`<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Sin artículos registrados</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:16px">
+          ${esSegundaEntrega
+            ? 'Los artículos en gris ya fueron entregados anteriormente. Los marcados ahora se sumarán al historial.'
+            : 'Los artículos marcados se considerarán entregados. Los no marcados quedarán pendientes.'}
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:4px">
+          <div class="field">
+            <label>Motivo de entrega parcial <span style="color:var(--red-text);font-size:10px;font-weight:400;text-transform:none">(requerido si no es entrega total)</span></label>
+            <textarea id="m-entrega-motivo" placeholder="Ej. Falta de stock, producto en tránsito, se entrega lo disponible..." style="min-height:60px;font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:var(--font-sans);width:100%;resize:vertical"></textarea>
+          </div>
+          <div class="form-grid two" style="gap:12px">
+            <div class="field">
+              <label>Notas adicionales (opcional)</label>
+              <textarea id="m-entrega-notas" placeholder="Observaciones, quién firmó, condición del paquete..." style="min-height:50px"></textarea>
+            </div>
+            <div class="field">
+              <label>Fecha de entrega</label>
+              <input type="date" id="m-entrega-fecha" value="${today()}">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="removeModal()">Cancelar</button>
+          <button class="btn-sm btn-approve" style="padding:8px 20px" onclick="confirmarEntrega('${folio}')">✓ Confirmar entrega</button>
+        </div>
+        <div id="entrega-error-msg" style="display:none;margin-top:12px;background:var(--red-bg);border:1px solid var(--red-text);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red-text);font-weight:500">
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if(e.target===overlay) removeModal(); });
+  }
+
+  async function confirmarEntrega(folio) {
+    const req = db.find(r => r.folio === folio);
+    if (!req) { removeModal(); return; }
+
+    const esSegundaEntrega = req.status === 'parcial';
+
+    const isYaEntregado = (a) => esSegundaEntrega &&
+      (a.entregado === true || (a.cantEntregada != null && a.cantEntregada >= a.cant));
+
+    const getCantMax = (a) => (esSegundaEntrega && a.cantEntregada != null)
+      ? Math.max(0, a.cant - a.cantEntregada)
+      : a.cant;
+
+    const errDiv = document.getElementById('entrega-error-msg');
+    const showErr = (msg) => {
+      if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; errDiv.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+    };
+
+    const hayError = (req.arts||[]).some((a,i) => {
+      if (isYaEntregado(a)) return false;
+      const val = parseFloat(document.getElementById(`art-cant-${i}`)?.value) || 0;
+      return val > getCantMax(a);
+    });
+    if (hayError) { showErr('⚠ Corrige las cantidades — algún artículo supera la cantidad pendiente.'); return; }
+    if (errDiv) errDiv.style.display = 'none';
+
+    const artsEntregados = (req.arts||[]).map((a,i) => {
+      if (isYaEntregado(a)) {
+        return { id: a.id, cant: a.cant, cantEntregada: a.cantEntregada, entregado: a.entregado };
+      }
+      const nuevaCant     = parseFloat(document.getElementById(`art-cant-${i}`)?.value) || 0;
+      const checked       = document.getElementById(`art-chk-${i}`)?.checked ?? true;
+      const prevEntregada = (esSegundaEntrega && a.cantEntregada != null) ? a.cantEntregada : 0;
+      const totalEntregada = checked ? prevEntregada + nuevaCant : prevEntregada;
+      return {
+        id:            a.id,
+        cant:          a.cant,
+        cantEntregada: totalEntregada,
+        entregado:     checked && totalEntregada >= a.cant,
+      };
+    });
+
+    const esCompleta = artsEntregados.every(a => a.entregado && a.cantEntregada >= a.cant);
+
+    if (!esCompleta) {
+      const motivo = (document.getElementById('m-entrega-motivo')?.value || '').trim();
+      if (!motivo) {
+        showErr('⚠ Escribe el motivo de la entrega parcial para poder confirmar.');
+        document.getElementById('m-entrega-motivo')?.focus();
+        return;
+      }
+    }
+
+    try {
+      await api(`/requisicion.php?folio=${folio}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          accion:        'entregar',
+          artsEntregados,
+          notas:         document.getElementById('m-entrega-notas').value,
+          motivoParcial: esCompleta ? '' : (document.getElementById('m-entrega-motivo')?.value || ''),
+          fechaEntrega:  document.getElementById('m-entrega-fecha').value,
+        }),
+      });
+      await reloadReq(folio);
+      removeModal();
+      renderAll();
+      showToast(esCompleta ? '✓ Requisición entregada completamente' : '⚠ Entrega parcial registrada — quedan artículos pendientes');
+    } catch(e) { showToast('Error: ' + e.message); }
+  }
+
+  // ─── ENCUESTA DE CALIDAD ──────────────────────────────────────────────────
+  function showEncuestaModal(folio) {
+    removeModal();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay'; overlay.id = 'modal-main';
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-title">Encuesta de calidad — ${folio}</div>
+        <div class="modal-sub">¿Lo solicitado cumplió con los estándares requeridos?</div>
+        <div style="display:flex;gap:14px;margin-bottom:16px">
+          <button class="btn-sm btn-approve" style="flex:1;padding:12px" onclick="encuestaRespuesta('${folio}', true)">✓ Sí, cumplió</button>
+          <button class="btn-sm btn-reject"  style="flex:1;padding:12px" onclick="showEncuestaNoModal('${folio}')">✕ No cumplió</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="removeModal();renderAll();showToast('✓ Requisición '+folio+' cerrada')">Omitir encuesta</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+
+  async function encuestaRespuesta(folio, ok) {
+    try {
+      await api(`/requisicion.php?folio=${folio}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ accion:'encuesta', encuesta: ok ? 'satisfecho' : 'insatisfecho' }),
+      });
+      await reloadReq(folio);
+    } catch(e) {}
+    removeModal(); renderAll(); showToast('✓ Requisición ' + folio + ' cerrada');
+  }
+
+  async function encuestaNoConfirm(folio) {
+    const motivo = document.getElementById('m-enc-motivo').value;
+    try {
+      await api(`/requisicion.php?folio=${folio}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ accion:'encuesta', encuesta:'insatisfecho', motivoEncuesta: motivo }),
+      });
+      await reloadReq(folio);
+    } catch(e) {}
+    removeModal(); renderAll(); showToast('Reporte de calidad enviado a Administración');
+  }
+
+  // ─── SEGUIMIENTO ──────────────────────────────────────────────────────────
+  const STATUS_LABELS = { borrador:'Borrador', pendiente:'Pendiente', aprobada:'Aprobada', rechazada:'Rechazada', entregada:'Entregada', parcial:'Parcial' };
+  const STATUS_BADGE  = { pendiente:'badge-pendiente', aprobada:'badge-aprobada', rechazada:'badge-rechazada', entregada:'badge-entregada', parcial:'badge-parcial' };
+
+  function setConcentradoFilter(val) {
+    const sel = document.getElementById('seg-filter-status');
+    if (sel) { sel.value = val; renderSeguimiento(); }
+  }
+
+  function setComprasStatusFilter(val) {
+    const sel = document.getElementById('compras-filter-status');
+    if (sel) { sel.value = val; renderCompras(); }
+  }
+
+  function toggleConcentradoDetail(folio) {
+    const existing = document.getElementById(`seg-detail-${folio}`);
+    const row      = document.getElementById(`seg-row-${folio}`);
+    if (existing) {
+      existing.remove();
+      row?.classList.remove('expanded');
+      return;
+    }
+    const req = db.find(r => r.folio === folio);
+    if (!req || !row) return;
+    row.classList.add('expanded');
+
+    const prioClass = { alto:'prio-alto', medio:'prio-medio', bajo:'prio-bajo' }[req.prioridad] || '';
+    const artsHtml = (req.arts||[]).map((a,i) => `
+      <tr>
+        <td style="padding:7px 12px;color:var(--text3);font-size:12px">${i+1}</td>
+        <td style="padding:7px 12px;font-size:12px;font-weight:500">${a.cant} ${a.unidad||''}</td>
+        <td style="padding:7px 12px;font-size:12px">${a.desc}</td>
+        <td style="padding:7px 12px;font-size:12px">${a.link?`<a href="${a.link}" target="_blank" style="color:var(--blue-text);font-size:11px">🔗 Ver enlace</a>`:'—'}</td>
+      </tr>`).join('');
+
+    const entregadosHtml = req.artsEntregados ? req.artsEntregados.map(a => `
+      <tr>
+        <td style="padding:5px 12px;font-size:12px">${a.entregado ? '✅' : '⏳'}</td>
+        <td style="padding:5px 12px;font-size:12px">${a.cantEntregada ?? a.cant} / ${a.cant} ${a.unidad||''}</td>
+        <td style="padding:5px 12px;font-size:12px">${a.desc}</td>
+        <td style="padding:5px 12px"><span class="badge ${a.entregado?'badge-entregada':'badge-pendiente'}" style="font-size:10px">${a.entregado?'Entregado':'Pendiente'}</span></td>
+      </tr>`).join('') : '';
+
+    const detailRow = document.createElement('tr');
+    detailRow.id = `seg-detail-${folio}`;
+    detailRow.className = 'seg-detail';
+    detailRow.innerHTML = `
+      <td colspan="9" style="padding:0;border-bottom:2px solid var(--border2)">
+        <div style="padding:20px 24px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 20px;margin-bottom:16px">
+            <div><div class="req-info-label">Solicitante</div><div class="req-info-value">${req.solicitante}</div></div>
+            <div><div class="req-info-label">Área</div><div class="req-info-value">${req.area||'—'}</div></div>
+            <div><div class="req-info-label">Prioridad</div><div class="req-info-value">${req.prioridad?`<span class="${prioClass}">${req.prioridad.toUpperCase()}</span>`:'—'}</div></div>
+            <div><div class="req-info-label">Dirección de entrega</div><div class="req-info-value">${req.direccion||'—'}</div></div>
+            <div><div class="req-info-label">Fecha de solicitud</div><div class="req-info-value">${fmtDate(req.createdAt?.slice(0,10))}</div></div>
+            <div><div class="req-info-label">Fecha estimada</div><div class="req-info-value">${fmtDate(req.fechaEstimada)}</div></div>
+            ${req.fechaEntrega?`<div><div class="req-info-label">Fecha de entrega</div><div class="req-info-value">${fmtDate(req.fechaEntrega)}</div></div>`:''}
+            ${req.aprobadaPor?`<div><div class="req-info-label">Aprobada por</div><div class="req-info-value">${req.aprobadaPor}</div></div>`:''}
+            ${req.comentariosJefe?`<div style="grid-column:1/-1"><div class="req-info-label">Notas del jefe</div><div class="req-info-value">${req.comentariosJefe}</div></div>`:''}
+            ${req.specs?`<div style="grid-column:1/-1"><div class="req-info-label">Especificaciones</div><div class="req-info-value">${req.specs}</div></div>`:''}
+            ${req.entregaNotas?`<div style="grid-column:1/-1"><div class="req-info-label">Notas de entrega</div><div class="req-info-value">${req.entregaNotas}</div></div>`:''}
+          </div>
+          <div style="display:grid;grid-template-columns:${req.artsEntregados?'1fr 1fr':'1fr'};gap:16px">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Artículos solicitados</div>
+              <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <thead><tr style="background:var(--surface)">
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">#</th>
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Cant.</th>
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Descripción</th>
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Enlace</th>
+                  </tr></thead>
+                  <tbody>${artsHtml}</tbody>
+                </table>
+              </div>
+            </div>
+            ${req.artsEntregados ? `
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Estado de entrega</div>
+              <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <thead><tr style="background:var(--surface)">
+                    <th style="padding:6px 12px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;width:32px"></th>
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Entregado</th>
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Artículo</th>
+                    <th style="padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Estado</th>
+                  </tr></thead>
+                  <tbody>${entregadosHtml}</tbody>
+                </table>
+              </div>
+            </div>` : ''}
+          </div>
+        </div>
+      </td>`;
+    row.after(detailRow);
+  }
+
+  function renderSeguimiento() {
+    const todasSeg = db.filter(r => ['aprobada','parcial','entregada'].includes(r.status));
+
+    // Poblar selector de mes/año
+    const fechaSel = document.getElementById('seg-filter-fecha');
+    if (fechaSel) {
+      const prev = fechaSel.value;
+      const meses = [...new Set(todasSeg.map(r => r.createdAt?.slice(0,7)).filter(Boolean))].sort().reverse();
+      fechaSel.innerHTML = '<option value="">Todas las fechas</option>' +
+        meses.map(m => {
+          const [y, mo] = m.split('-');
+          return `<option value="${m}"${m===prev?' selected':''}>${MESES_ES[parseInt(mo)-1]} ${y}</option>`;
+        }).join('');
+    }
+
+    const filterStatus = document.getElementById('seg-filter-status')?.value || '';
+    const prioFiltro   = document.getElementById('seg-filter-prio')?.value   || '';
+    const fechaFiltro  = document.getElementById('seg-filter-fecha')?.value  || '';
+    const search       = (document.getElementById('seg-search')?.value || '').toLowerCase();
+
+    let reqs = [...todasSeg];
+    if (filterStatus) reqs = reqs.filter(r => r.status === filterStatus);
+    if (prioFiltro)   reqs = reqs.filter(r => r.prioridad === prioFiltro);
+    if (fechaFiltro)  reqs = reqs.filter(r => r.createdAt?.startsWith(fechaFiltro));
+    if (search) reqs = reqs.filter(r =>
+      (r.vin||'').toLowerCase().includes(search) ||
+      (r.proyecto||'').toLowerCase().includes(search) ||
+      (r.solicitante||'').toLowerCase().includes(search)
+    );
+
+    const total      = todasSeg.length;
+    const xEntregar  = todasSeg.filter(r => r.status === 'aprobada').length;
+    const entregadas = todasSeg.filter(r => r.status === 'entregada').length;
+    const parcial    = todasSeg.filter(r => r.status === 'parcial').length;
+    document.getElementById('seg-metrics').innerHTML = `
+      <div class="metric-card" style="cursor:pointer" onclick="setConcentradoFilter('')">
+        <div class="metric-val">${total}</div><div class="metric-label">Total en concentrado</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setConcentradoFilter('aprobada')">
+        <div class="metric-val" style="color:var(--amber-text)">${xEntregar}</div><div class="metric-label">Por entregarse</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setConcentradoFilter('entregada')">
+        <div class="metric-val" style="color:var(--teal-text)">${entregadas}</div><div class="metric-label">Entregadas</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setConcentradoFilter('parcial')">
+        <div class="metric-val" style="color:var(--blue-text)">${parcial}</div><div class="metric-label">Entrega parcial</div></div>`;
+
+    const tbody = document.getElementById('seg-tbody');
+    if (!reqs.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">Sin resultados para esta búsqueda</td></tr>';
+      return;
+    }
+    const prioClass = { alto:'prio-alto', medio:'prio-medio', bajo:'prio-bajo' };
+    const SEG_LABEL = { aprobada:'Por entregarse', parcial:'Entrega parcial', entregada:'Entregada' };
+    tbody.innerHTML = reqs.map(r => `
+      <tr id="seg-row-${r.folio}" class="seg-row" onclick="toggleConcentradoDetail('${r.folio}')">
+        <td style="padding:10px 14px;width:32px;text-align:center"><span class="seg-chevron">▶</span></td>
+        <td class="folio">${r.folio}</td>
+        <td style="font-family:var(--font-mono);font-size:11px">${r.vin}</td>
+        <td>${r.proyecto}</td>
+        <td>${r.solicitante}</td>
+        <td>${r.area||'—'}</td>
+        <td>${r.prioridad?`<span class="${prioClass[r.prioridad]||''}">${r.prioridad.toUpperCase()}</span>`:'—'}</td>
+        <td><span class="badge ${STATUS_BADGE[r.status]||''}">${SEG_LABEL[r.status]||STATUS_LABELS[r.status]||r.status}</span></td>
+        <td style="font-size:12px">${fmtDate(r.fechaEstimada)}</td>
+      </tr>`).join('');
+  }
+
+  // ─── MIS SOLICITUDES ──────────────────────────────────────────────────────
+  let misFilter = '';
+
+  function setMisFilter(val) {
+    misFilter = val;
+    document.querySelectorAll('#mis-tabs .type-tab').forEach(btn => {
+      const match = btn.getAttribute('onclick') === `setMisFilter('${val}')`;
+      btn.classList.toggle('active', match);
+    });
+    renderMis();
+  }
+
+  const SOL_PROCESO = ['aprobada'];
+
+  const SOL_LABEL = {
+    pendiente:'Por aprobar', rechazada:'Rechazada',
+    aprobada:'En proceso de compra',
+    parcial:'En almacén', entregada:'Entregada',
+  };
+  const SOL_BADGE = {
+    pendiente:'badge-pendiente', rechazada:'badge-rechazada',
+    aprobada:'badge-compras',
+    parcial:'badge-parcial', entregada:'badge-entregada',
+  };
+
+  const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  function renderMis() {
+    if (!CURRENT_USER) return;
+    const cont = document.getElementById('mis-list');
+
+    const todas = db.filter(r => r.createdBy === CURRENT_USER.email);
+    const cRechazadas = todas.filter(r => r.status === 'rechazada').length;
+    const cEntregadas = todas.filter(r => r.status === 'entregada').length;
+    const cEncuesta   = todas.filter(r => r.status === 'entregada' && !r.encuesta).length;
+
+    const metrics = document.getElementById('mis-metrics');
+    if (metrics) metrics.innerHTML = `
+      <div class="metric-card" style="cursor:pointer" onclick="setMisFilter('')">
+        <div class="metric-val">${todas.length}</div><div class="metric-label">Total solicitudes</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setMisFilter('rechazada')">
+        <div class="metric-val" style="color:var(--red-text)">${cRechazadas}</div><div class="metric-label">Rechazadas</div></div>
+      <div class="metric-card" style="cursor:pointer" onclick="setMisFilter('entregada')">
+        <div class="metric-val" style="color:var(--teal-text)">${cEntregadas}</div><div class="metric-label">Entregadas</div></div>
+      <div class="metric-card" style="cursor:pointer;${cEncuesta>0?'border-color:var(--amber-text);':''}" onclick="setMisFilter('encuesta')">
+        <div class="metric-val" style="color:${cEncuesta>0?'var(--amber-text)':'var(--text3)'}">${cEncuesta}</div>
+        <div class="metric-label">Encuestas pendientes</div></div>`;
+
+    // Poblar selector de mes/año sin perder selección actual
+    const fechaSel = document.getElementById('mis-filter-fecha');
+    if (fechaSel) {
+      const prev = fechaSel.value;
+      const meses = [...new Set(todas.map(r => r.createdAt?.slice(0,7)).filter(Boolean))].sort().reverse();
+      fechaSel.innerHTML = '<option value="">Todas las fechas</option>' +
+        meses.map(m => {
+          const [y, mo] = m.split('-');
+          return `<option value="${m}"${m===prev?' selected':''}>${MESES_ES[parseInt(mo)-1]} ${y}</option>`;
+        }).join('');
+    }
+
+    const search       = (document.getElementById('mis-search')?.value || '').toLowerCase().trim();
+    const fechaFiltro  = document.getElementById('mis-filter-fecha')?.value || '';
+
+    let mias = [...todas];
+    if      (misFilter === 'pendiente') mias = mias.filter(r => r.status === 'pendiente');
+    else if (misFilter === 'parcial')   mias = mias.filter(r => r.status === 'parcial');
+    else if (misFilter === 'entregada') mias = mias.filter(r => r.status === 'entregada');
+    else if (misFilter === 'rechazada') mias = mias.filter(r => r.status === 'rechazada');
+    else if (misFilter === 'encuesta')  mias = mias.filter(r => r.status === 'entregada' && !r.encuesta);
+
+    if (fechaFiltro) mias = mias.filter(r => r.createdAt?.startsWith(fechaFiltro));
+    if (search)      mias = mias.filter(r =>
+      (r.vin||'').toLowerCase().includes(search) ||
+      (r.proyecto||'').toLowerCase().includes(search)
+    );
+
+    const hayFiltro = misFilter || fechaFiltro || search;
+    if (!mias.length) {
+      cont.innerHTML = '<div class="empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>' + (hayFiltro ? 'Sin resultados para esta búsqueda' : 'Aún no has enviado requisiciones') + '</div>';
+      return;
+    }
+    cont.innerHTML = '';
+    mias.slice().reverse().forEach(req => {
+      const card = document.createElement('div');
+      card.className = 'req-card';
+      const label    = SOL_LABEL[req.status] || req.status;
+      const badgeCls = SOL_BADGE[req.status] || '';
+      card.innerHTML = `
+        <div class="req-card-head">
+          <div class="req-card-left">
+            <span class="badge ${badgeCls}">${label}</span>
+            <span class="req-folio">${req.folio}</span>
+          </div>
+          <span style="font-size:12px;color:var(--text3)">Enviada el ${fmtDate(req.createdAt?.slice(0,10))}</span>
+        </div>
+        <div class="req-card-body">
+          <div><div class="req-info-label">Proyecto</div><div class="req-info-value">${req.proyecto}</div></div>
+          <div><div class="req-info-label">VIN</div><div class="req-info-value" style="font-family:var(--font-mono)">${req.vin}</div></div>
+          <div><div class="req-info-label">Artículos</div><div class="req-info-value">${req.arts?.length||0} artículo(s)</div></div>
+          <div><div class="req-info-label">Fecha de solicitud</div><div class="req-info-value">${fmtDate(req.createdAt?.slice(0,10))}</div></div>
+          ${req.fechaEstimada?`<div><div class="req-info-label">Entrega estimada</div><div class="req-info-value">${fmtDate(req.fechaEstimada)}</div></div>`:''}
+          ${req.motivoRechazo?`<div style="grid-column:1/-1"><div class="req-info-label" style="color:var(--red-text)">Motivo de rechazo</div><div class="req-info-value" style="color:var(--red-text)">${req.motivoRechazo}</div></div>`:''}
+          ${req.motivoParcial?`<div style="grid-column:1/-1"><div class="req-info-label" style="color:var(--amber-text)">Motivo de entrega parcial</div><div class="req-info-value" style="color:var(--amber-text)">${req.motivoParcial}</div></div>`:''}
+          ${req.entregaNotas?`<div style="grid-column:1/-1"><div class="req-info-label">Notas de entrega</div><div class="req-info-value">${req.entregaNotas}</div></div>`:''}
+          ${req.encuesta?`<div><div class="req-info-label">Encuesta calidad</div><div class="req-info-value">${req.encuesta==='satisfecho'?'✅ Satisfecho':'⚠️ Insatisfecho'}</div></div>`:''}
+          ${req.status==='parcial' && (req.arts||[]).some(a=>a.cantEntregada!=null) ? `<div style="grid-column:1/-1">
+            <div class="req-info-label" style="margin-bottom:6px">Detalle de entrega parcial</div>
+            <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead><tr style="background:var(--surface2)">
+                  <th style="padding:6px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Artículo</th>
+                  <th style="padding:6px 10px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;width:140px">Entregado / Solicitado</th>
+                  <th style="padding:6px 10px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;width:90px">Estado</th>
+                </tr></thead>
+                <tbody>${(req.arts||[]).map(a=>{
+                  const entregado = a.entregado===true||(a.cantEntregada!=null&&a.cantEntregada>=a.cant);
+                  const badge = entregado
+                    ? '<span class="badge badge-entregada" style="font-size:10px">Entregado</span>'
+                    : '<span class="badge badge-parcial" style="font-size:10px">Pendiente</span>';
+                  return `<tr><td style="padding:7px 10px">${a.desc}</td><td style="padding:7px 10px;text-align:center">${a.cantEntregada!=null?a.cantEntregada:0} / ${a.cant} ${a.unidad||''}</td><td style="padding:7px 10px;text-align:center">${badge}</td></tr>`;
+                }).join('')}</tbody>
+              </table>
+            </div>
+          </div>` : ''}
+        </div>
+        ${req.status==='entregada' && !req.encuesta ? `
+        <div class="req-card-actions" style="background:var(--amber-bg);border-radius:0 0 var(--radius-lg) var(--radius-lg);margin:-1px -1px 0;padding:12px 20px;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--amber-text);font-weight:500">¿Los artículos cumplieron con lo solicitado?</span>
+          <button class="btn-sm btn-approve" onclick="showEncuestaModal('${req.folio}')">Responder encuesta</button>
+        </div>` : ''}`;
+      cont.appendChild(card);
+    });
+  }
+
+  // ─── HELPERS ──────────────────────────────────────────────────────────────
+  function setStatus(folio, status) {
+    const req = db.find(r => r.folio === folio);
+    if (req) req.status = status;
+    renderAll(); showToast('Estatus actualizado: ' + STATUS_LABELS[status]);
+  }
+
+  function removeModal() {
+    const m = document.getElementById('modal-main');
+    if (m) m.remove();
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.style.opacity = '0', 3200);
+  }
+
+  // ─── NOTIFICACIONES — API polling ────────────────────────────────────────
+  let _notifInterval = null;
+
+  function startNotifPolling() {
+    fetchNotifs();                                  // inmediato al login
+    _notifInterval = setInterval(fetchNotifs, 15000); // cada 15 segundos
+  }
+  function stopNotifPolling() {
+    clearInterval(_notifInterval);
+    _notifInterval = null;
+  }
+
+  async function fetchNotifs() {
+    try {
+      const data = await api('/notificaciones.php');
+      notifications = (data.notificaciones || []).map(n => ({
+        id:   n.id,
+        msg:  n.mensaje,
+        time: n.creado_en,
+        read: !!n.leida,
+      }));
+      updateNotifBadge();
+    } catch(e) {}
+  }
+
+  function updateNotifBadge() {
+    const unread = notifications.filter(n => !n.read).length;
+    const badge  = document.getElementById('notif-badge');
+    badge.textContent = unread || '';
+    badge.style.display = unread > 0 ? 'block' : 'none';
+  }
+
+  function toggleNotifPanel() {
+    const panel = document.getElementById('notif-panel');
+    const isOpen = panel.style.display === 'block';
+    panel.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) renderNotifPanel();
+  }
+
+  function renderNotifPanel() {
+    const list = document.getElementById('notif-list');
+    if (!notifications.length) {
+      list.innerHTML = '<div class="notif-empty">Sin notificaciones</div>';
+      return;
+    }
+    list.innerHTML = [...notifications].reverse().map(n => `
+      <div class="notif-item${n.read ? '' : ' unread'}" onclick="markRead(${n.id})">
+        <div class="notif-msg">${n.msg}</div>
+        <div class="notif-time">${fmtDate((n.time||'').slice(0,10))}</div>
+      </div>`).join('');
+  }
+
+  async function markRead(id) {
+    const n = notifications.find(x => x.id === id);
+    if (n) { n.read = true; renderNotifPanel(); updateNotifBadge(); }
+    try { await api('/notificaciones.php', { method:'PATCH', body: JSON.stringify({ id }) }); } catch(e) {}
+  }
+
+  async function markAllRead() {
+    notifications.forEach(n => n.read = true);
+    renderNotifPanel();
+    updateNotifBadge();
+    try { await api('/notificaciones.php', { method:'PATCH', body: JSON.stringify({ id:'all' }) }); } catch(e) {}
+  }
+
+  function showEncuestaNoModal(folio) {
+    removeModal();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay'; overlay.id = 'modal-main';
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-title">¿Por qué no cumplió?</div>
+        <div class="modal-sub">Esta información llegará a Administración y Finanzas.</div>
+        <div class="field">
+          <textarea id="m-enc-motivo" placeholder="Describe el problema con los artículos recibidos..." style="min-height:90px"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="removeModal()">Cancelar</button>
+          <button class="btn-sm btn-reject" style="padding:8px 20px" onclick="encuestaNoConfirm('${folio}')">Enviar reporte</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+
+  document.addEventListener('click', e => {
+    const panel = document.getElementById('notif-panel');
+    const btn   = document.getElementById('notif-btn');
+    if (panel && panel.style.display === 'block' && !panel.contains(e.target) && !btn.contains(e.target)) {
+      panel.style.display = 'none';
+    }
+  });
+
+  // ─── EXPORTAR CSV ─────────────────────────────────────────────────────────
+  function exportConcentradoCSV() {
+    const todasSeg = db.filter(r => ['aprobada','parcial','entregada'].includes(r.status));
+
+    const filterStatus = document.getElementById('seg-filter-status')?.value || '';
+    const prioFiltro   = document.getElementById('seg-filter-prio')?.value   || '';
+    const fechaFiltro  = document.getElementById('seg-filter-fecha')?.value  || '';
+    const search       = (document.getElementById('seg-search')?.value || '').toLowerCase();
+
+    let reqs = [...todasSeg];
+    if (filterStatus) reqs = reqs.filter(r => r.status === filterStatus);
+    if (prioFiltro)   reqs = reqs.filter(r => r.prioridad === prioFiltro);
+    if (fechaFiltro)  reqs = reqs.filter(r => r.createdAt?.startsWith(fechaFiltro));
+    if (search)       reqs = reqs.filter(r =>
+      (r.vin||'').toLowerCase().includes(search) ||
+      (r.proyecto||'').toLowerCase().includes(search) ||
+      (r.solicitante||'').toLowerCase().includes(search)
+    );
+
+    if (!reqs.length) { showToast('Sin datos para exportar'); return; }
+
+    const SEG_LABEL = { aprobada:'Por entregarse', parcial:'Entrega parcial', entregada:'Entregada' };
+    const PRIO_LABEL = { alto:'Alta', medio:'Media', bajo:'Baja' };
+
+    const headers = [
+      'Folio', 'VIN', 'Proyecto', 'Solicitante', 'Área', 'Prioridad',
+      'Estatus', 'Fecha de solicitud', 'Fecha estimada', 'Fecha de entrega',
+      'Dirección', 'Aprobada por', 'Artículos solicitados', 'Notas de entrega',
+    ];
+
+    const rows = reqs.map(r => [
+      r.folio,
+      r.vin,
+      r.proyecto,
+      r.solicitante,
+      r.area || '',
+      PRIO_LABEL[r.prioridad] || '',
+      SEG_LABEL[r.status] || r.status,
+      r.createdAt?.slice(0,10) || '',
+      r.fechaEstimada || '',
+      r.fechaEntrega  || '',
+      r.direccion     || '',
+      r.aprobadaPor   || '',
+      (r.arts||[]).map(a => `${a.cant} ${a.unidad} - ${a.desc}`).join(' | '),
+      r.entregaNotas  || '',
+    ]);
+
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = [headers, ...rows].map(row => row.map(esc).join(',')).join('\r\n');
+
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `concentrado_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`✓ ${reqs.length} registros exportados`);
+  }
+
+  // ─── INIT ─────────────────────────────────────────────────────────────────
+  db = [];
+  notifications = [];
+  addArtRow();
+
+  // Permitir login con Enter en los campos
+  ['login-email','login-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  });
+</script>
+</body>
+</html>
